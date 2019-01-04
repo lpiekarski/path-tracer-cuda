@@ -1,4 +1,4 @@
-#define RTC_TIMER
+/*#define RTC_TIMER
 #define RTC_PRECISION_DOUBLE
 #include "tracer.h"
 #include "tclist.h"
@@ -18,26 +18,6 @@ using namespace rtc;
 const size_t bpp = 3;
 
 tracer<tracable_list<3, bpp>, 3, bpp> trc;
-
-/*
-void add_cube(vec_type offset) {
-vec3 v1 = vec3(offset - 1, offset - 1, offset - 1),
-v2 = vec3(offset - 1, offset - 1, offset + 1),
-v3 = vec3(offset - 1, offset + 1, offset - 1),
-v4 = vec3(offset - 1, offset + 1, offset + 1),
-v5 = vec3(offset + 1, offset - 1, offset - 1),
-v6 = vec3(offset + 1, offset - 1, offset + 1),
-v7 = vec3(offset + 1, offset + 1, offset - 1),
-v8 = vec3(offset + 1, offset + 1, offset + 1),
-Triangle t1(),
-t2(),
-t3(),
-t4(),
-t5(),
-t6(),
-t7(),
-t8()
-}*/
 
 int main() {
     //rtc::vec_type off = 0;
@@ -61,4 +41,29 @@ int main() {
     trc.draw_bitmap<4>(1080, 1080)[0].write("test.bmp");
     //system("test.bmp");
     //vec3 v = (vec3(1, 2, 3) + 4) * 5 * vec3(2, 2, 0.5);
+}*/
+#define RTC_USE_CUDA
+#include <cuda_runtime.h>
+#include "defs.h"
+#include <array>
+
+const int threads_num = 20;
+
+__global__ void test() {
+    __shared__ float a[threads_num];//rtc::_array<float, threads_num> a;
+    a[threadIdx.x] = 0;
+    __syncthreads();
+    for (size_t i = 0; i < threads_num; ++i)
+        ++a[i];
+    __syncthreads();
+    for (size_t i = 0; i < threads_num; ++i)
+        printf("%d %f\n", threadIdx.x, a[threadIdx.x]);
+    
+}
+
+int main() {
+    //auto d_arr = rtc::_array<int, 5>::device_ctr();
+    
+    test<<<1, threads_num>>>();
+    cudaDeviceSynchronize();
 }
