@@ -16,7 +16,7 @@ _RTC_BEGIN
 template <size_t N>
     class camera {
     private:
-        std::array<normal<N>, N> base;
+        _array<normal<N>, N> base;
         vector<N - 1> screen_dims;
         vec_type screen_dist;
 

@@ -19,7 +19,7 @@ template <size_t N,
 
         virtual ray<N> get_reflection(const ray<N>& r,
             const vector<N>& intersection_point) = 0;
-    };
+};
 _RTC_END
 
 #endif /* __TRACABLE_H__ */

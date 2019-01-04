@@ -16,7 +16,7 @@ template <size_t N>
 
     // FUNCTION TEMPLATE dot
 template <size_t N>
-    vec_type dot(const vector<N>& v1,
+    _DEVHOST vec_type dot(const vector<N>& v1,
         const vector<N>& v2) {
         vec_type ret = 0;
         for (size_t i = 0; i < N; ++i)
@@ -26,38 +26,38 @@ template <size_t N>
 
     // FUNCTION TEMPLATE len2
 template <size_t N>
-    vec_type len2(const vector<N>& v1) {
+    _DEVHOST vec_type len2(const vector<N>& v1) {
         return dot(v1, v1);
     }
 
     // FUNCTION TEMPLATE len
 template <size_t N>
-    vec_type len(const vector<N>& v1) {
+    _DEVHOST vec_type len(const vector<N>& v1) {
         return sqrt(len2(v1));
     }
 
     // FUNCTION TEMPLATE dist2
 template <size_t N>
-    vec_type dist2(const vector<N>& v1,
+    _DEVHOST vec_type dist2(const vector<N>& v1,
         const vector<N>& v2) {
         return len2(v1 - v2);
     }
 
     // FUNCTION TEMPLATE dist
 template <size_t N>
-    vec_type dist(const vector<N>& v1,
+    _DEVHOST vec_type dist(const vector<N>& v1,
         const vector<N>& v2) {
         return len(v1 - v2);
     }
 
     // FUNCTION TEMPLATE cross
 template <size_t N>
-    vector<N> cross(const vector<N>& v1,
+    _DEVHOST vector<N> cross(const vector<N>& v1,
         const vector<N>& v2) {
         throw std::exception("unimplemented function");
     }
 
-    vec3 cross(const vec3& v1,
+    _DEVHOST vec3 cross(const vec3& v1,
         const vec3& v2) {
         return vec3(
             v1[1] * v2[2] - v1[2] * v2[1],
@@ -69,11 +69,10 @@ template <size_t N>
 template <size_t N>
     class normal : public vector<N> {
     private:
-
         using _Mybase = vector<N>;
 
     template <typename... P>
-        void normalize(P... args) {
+        _DEVHOST void normalize(P... args) {
             if (sizeof...(P) == 0)
                 return;
             vec_type ln = len(*this);
@@ -84,11 +83,11 @@ template <size_t N>
         }
 
     public:
-        normal() 
+        _DEVHOST normal()
             : _Mybase(unit_vector<N>(0)) {}
 
     template <typename... P>
-        normal(P... args) 
+        _DEVHOST normal(P... args) 
             : _Mybase(args...) {
             normalize(args...);
         }
@@ -98,21 +97,21 @@ template <size_t N>
 
     // FUNCTION TEMPLATE rotate
 template <size_t N>
-    vector<N> rotate(vector<N> v,
+    _DEVHOST vector<N> rotate(vector<N> v,
         normal<N> axis) {
         throw std::exception("unimplemented function");
     }
 
     // FUNCTION TEMPLATE reflect
 template <size_t N>
-    normal<N> reflect(const vector<N>& i,
+    _DEVHOST normal<N> reflect(const vector<N>& i,
         const normal<N>& n) {
         return i - (static_cast<vec_type>(2) * dot(n, i) * n);
     }
 
     // FUNCTION TEMPLATE unit_vector
 template <size_t N>
-    normal<N> unit_vector(size_t i) {
+    _DEVHOST normal<N> unit_vector(size_t i) {
         vector<N> ret;
         ret[i] = 1;
         return ret;
@@ -120,8 +119,8 @@ template <size_t N>
 
     // FUNCTION TEMPLATE standard_base
 template <size_t N>
-    std::array<normal<N>, N> standard_base() {
-        std::array<normal<N>, N> ret;
+    _array<normal<N>, N> standard_base() {
+        _array<normal<N>, N> ret;
         for (size_t i = 0; i < N; ++i)
             ret[i] = unit_vector<N>(i);
         return ret;

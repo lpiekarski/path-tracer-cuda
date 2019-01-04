@@ -10,6 +10,7 @@
 
 #include <iostream>
 
+#include "defs.h"
 #include "rtc.h"
 #include "exception.h"
 #include "color.h"
@@ -19,12 +20,12 @@ _RTC_BEGIN
 template <size_t BPP>
     class bitmap {
     private:
-        std::vector<char> data;
+        _vector<char> data;
         size_t row_size;
         size_t width, height;
 
     public:
-        bitmap(size_t width, size_t height)
+        _DEVHOST bitmap(size_t width, size_t height)
             : data(), 
             width(width),
             height(height) {
@@ -56,16 +57,16 @@ template <size_t BPP>
             little_endian_insert<size_t>(2835, 4, data, 42); 
         }
 
-        bitmap(const char* filename) { read(filename); }
+        _HOST bitmap(const char* filename) { read(filename); }
 
-        bitmap(const bitmap& other) {
+        _DEVHOST bitmap(const bitmap& other) {
             data = other.data;
             row_size = other.row_size;
             width = other.width;
             height = other.height;
         }
 
-        color<BPP> get(size_t x, size_t y) const {
+        _DEVHOST color<BPP> get(size_t x, size_t y) const {
             size_t bytes = BPP;
             size_t off = 14 + 40 + y * row_size + x * bytes;
             if (off + bytes - 1 >= data.size())
@@ -78,7 +79,7 @@ template <size_t BPP>
             return color<BPP>(ret);
         }
 
-        void set(size_t x, size_t y, const color<BPP>& val) {
+        _DEVHOST void set(size_t x, size_t y, const color<BPP>& val) {
             byte_color<BPP> v(val);
             size_t bytes = BPP;
             size_t off = 14 + 40 + y * row_size + x * bytes;
@@ -89,7 +90,7 @@ template <size_t BPP>
                 data[off + bytes - 1 - i] = v[i];
         }
 
-        bool write(const char *filename) const {
+        _HOST bool write(const char *filename) const {
             std::ofstream of(filename, std::ios::binary);
             if (!of)
                 return false;
@@ -102,7 +103,7 @@ template <size_t BPP>
             return true;
         }
         
-        bool read(const char *filename) {
+        _HOST bool read(const char *filename) {
             std::ifstream f(filename, std::ios::binary);
             if (!f)
                 return false;

@@ -15,7 +15,7 @@ template <size_t N,
     size_t BPP>
     class tracable_list {
     private:
-        std::vector<tracable<N, BPP>*> tracables;
+        _vector<tracable<N, BPP>*> tracables;
 
     public:
         tracable_list() : tracables() {}
@@ -50,7 +50,7 @@ template <size_t N,
 template <size_t N,
     size_t BPP>
     struct is_tracable_container<tracable_list<N, BPP>> 
-    : std::true_type {};
+    : true_type {};
 _RTC_END
 
 #endif /* __TCLIST_H__ */

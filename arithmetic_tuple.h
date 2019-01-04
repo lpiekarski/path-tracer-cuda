@@ -15,7 +15,7 @@ template <typename T,
     size_t N>
     class arithmetic_tuple {
     protected:
-        std::array<T, N> values;
+        _array<T, N> values;
     
     public:
         arithmetic_tuple() 

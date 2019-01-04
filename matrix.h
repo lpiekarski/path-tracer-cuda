@@ -14,7 +14,7 @@ template <size_t N,
     // FUNCTION TEMPLATE identity
 template <size_t N,
     size_t M>
-    matrix<N, M> identity() {
+    _DEVHOST matrix<N, M> identity() {
         matrix<N, M> ret;
         size_t i = 0;
         while (i < N && i < M) {
@@ -27,14 +27,14 @@ template <size_t N,
     // FUNCTION TEMPLATE row
 template <size_t N,
     size_t M>
-    vector<M> row(const matrix<N, M>& m, size_t idx) {
+    _DEVHOST vector<M> row(const matrix<N, M>& m, size_t idx) {
         return m[idx];
     }
 
     // FUNCTION TEMPLATE column
 template <size_t N, 
     size_t M>
-    vector<N> column(const matrix<N, M>& m, size_t idx) {
+    _DEVHOST vector<N> column(const matrix<N, M>& m, size_t idx) {
         vector<N> ret;
         for (size_t i = 0; i < N; ++i)
             ret[i] = m[i][idx];
@@ -45,7 +45,7 @@ template <size_t N,
 template <size_t N,
     size_t M,
     size_t K>
-    matrix<N, K> operator*(const matrix<N, M>& m1, const matrix<M, K>& m2) {
+    _DEVHOST matrix<N, K> operator*(const matrix<N, M>& m1, const matrix<M, K>& m2) {
         matrix<N, K> ret;
         for (size_t i = 0; i < N; ++i)
             for (size_t j = 0; j < K; ++j)
@@ -56,7 +56,7 @@ template <size_t N,
     // FUNCTION TEMPLATE operator*
 template <size_t N,
     size_t M>
-    vector<N> operator*(const matrix<N, M>& m1, const vector<M>& v) {
+    _DEVHOST vector<N> operator*(const matrix<N, M>& m1, const vector<M>& v) {
         vector<N> ret;
         for (size_t i = 0; i < N; ++i)
             ret[i] = dot(row(m1, i), v);

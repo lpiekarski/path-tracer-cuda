@@ -11,9 +11,9 @@
 #include "arithmetic_tuple.h"
 
 _RTC_BEGIN
-    static constexpr int COL_LOG_RADIX = 8;
-    static constexpr int COL_RADIX = 1 << COL_LOG_RADIX;
-    static constexpr int COL_RADIX_MASK = COL_RADIX - 1;
+    _DEVHOST static constexpr int COL_LOG_RADIX = 8;
+    _DEVHOST static constexpr int COL_RADIX = 1 << COL_LOG_RADIX;
+    _DEVHOST static constexpr int COL_RADIX_MASK = COL_RADIX - 1;
 
     // ALIAS TEMPLATE byte_color
 template <size_t BPP>
@@ -23,21 +23,21 @@ template <size_t BPP>
 
     using col32bpp = byte_color<4>;
 
-    std::ostream& operator<<(std::ostream& s, col24bpp& c) {
+    _HOST std::ostream& operator<<(std::ostream& s, col24bpp& c) {
         s << '#';
         s << std::setbase(16) << std::setw(6) << std::setfill('0') << 
             ((((c[0] << COL_LOG_RADIX) + c[1]) << COL_LOG_RADIX) + c[2]);
         return s;
     }
 
-    std::istream& operator>>(std::istream& s, col24bpp& c) {
+    _HOST std::istream& operator>>(std::istream& s, col24bpp& c) {
         s >> c[0] >> c[1] >> c[2];
         return s;
     }
     
     // FUNCTION TEMPLATE operator*
 template <size_t BPP>
-    byte_color<BPP> operator*(const byte_color<BPP>& c1, const byte_color<BPP>& c2) {
+    _DEVHOST byte_color<BPP> operator*(const byte_color<BPP>& c1, const byte_color<BPP>& c2) {
         byte_color<BPP> ret;
         size_t N = BPP;
         for (size_t i = 0; i < N; ++i)
@@ -47,7 +47,7 @@ template <size_t BPP>
 
     // FUNCTION TEMPLATE operator+
 template <size_t BPP>
-    byte_color<BPP> operator+(const byte_color<BPP>& c1, const byte_color<BPP>& c2) {
+    _DEVHOST byte_color<BPP> operator+(const byte_color<BPP>& c1, const byte_color<BPP>& c2) {
         byte_color<BPP> ret;
         size_t N = BPP;
         for (size_t i = 0; i < N; ++i) {
@@ -65,31 +65,31 @@ template <size_t BPP>
     private:
         using _Mybase =  arithmetic_tuple<vec_type, BPP>;
 
-        char coord_to_char(const vec_type& x) const {
+        _DEVHOST char coord_to_char(const vec_type& x) const {
             return (char)(((static_cast<vec_type>(2) / (exp(-x) + static_cast<vec_type>(1))) - static_cast<vec_type>(1)) * COL_RADIX);
         }
 
-        vec_type char_to_coord(const char& x) const {
+        _DEVHOST vec_type char_to_coord(const char& x) const {
             return -log(static_cast<vec_type>(2) / (x / static_cast<vec_type>(COL_RADIX) + static_cast<vec_type>(1)) - static_cast<vec_type>(1));
         }
 
     public:
-        color() : _Mybase() {}
+        _DEVHOST color() : _Mybase() {}
 
-        color(const vec_type *arr) : _Mybase(arr) {}
+        _DEVHOST color(const vec_type *arr) : _Mybase(arr) {}
 
-        color(const color<BPP>& other) :
+        _DEVHOST color(const color<BPP>& other) :
             _Mybase(other.values.data()) {}
 
-        color(const byte_color<BPP>& other) {
+        _DEVHOST color(const byte_color<BPP>& other) {
             size_t N = BPP;
             for (size_t i = 0; i < N; ++i)
                 this->values[i] = char_to_coord(other[i]);
         }
 
-        color(const _Mybase& other) : _Mybase(other) {}
+        _DEVHOST color(const _Mybase& other) : _Mybase(other) {}
 
-        operator byte_color<BPP>() const {
+        _DEVHOST operator byte_color<BPP>() const {
             byte_color<BPP> ret;
             size_t N = BPP;
             for (size_t i = 0; i < N; ++i)
@@ -99,7 +99,7 @@ template <size_t BPP>
 
     template <typename... Type,
         typename = std::enable_if_t<are_convertible<vec_type, Type...>::value && sizeof...(Type) == BPP>>
-        color(Type... vals) : _Mybase() {
+        _DEVHOST color(Type... vals) : _Mybase() {
             this->values = { static_cast<vec_type>(vals)... };
         }
 
@@ -107,7 +107,7 @@ template <size_t BPP>
 
     // FUNCTION TEMPLATE gray
 template <size_t BPP>
-    color<BPP> gray(const vec_type& val) {
+    _DEVHOST color<BPP> gray(const vec_type& val) {
         color<BPP> ret;
         size_t N = BPP;
         for (size_t i = 0; i < N; ++i)
@@ -117,7 +117,7 @@ template <size_t BPP>
 
     // FUNCTION TEMPLATE white
 template <size_t BPP>
-    color<BPP> white() {
+    _DEVHOST color<BPP> white() {
         return gray<BPP>(static_cast<vec_type>(1));
     }
 _RTC_END

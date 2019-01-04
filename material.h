@@ -16,4 +16,4 @@ template <size_t BPP>
     };
 _RTC_END
 
-#endif
+#endif /* __MATERIAL_H__ */
