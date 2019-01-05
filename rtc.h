@@ -11,21 +11,21 @@
 _RTC_BEGIN
 #if defined(RTC_PRECISION_LONG_DOUBLE)
 using vec_type = long double;
-_DEVHOST constexpr vec_type EPSILON = LDBL_EPSILON * 30;
-_DEVHOST constexpr vec_type SURFACE_EPSILON = 30 * EPSILON;
-_DEVHOST constexpr vec_type MAX_RAY_LENGTH = LDBL_MAX;
+constexpr vec_type EPSILON = LDBL_EPSILON * 30;
+constexpr vec_type SURFACE_EPSILON = 30 * EPSILON;
+constexpr vec_type MAX_RAY_LENGTH = LDBL_MAX;
 
 #elif defined(RTC_PRECISION_DOUBLE)
 using vec_type = double;
-_DEVHOST constexpr vec_type EPSILON = DBL_EPSILON;
-_DEVHOST constexpr vec_type SURFACE_EPSILON = 30 * EPSILON;
-_DEVHOST constexpr vec_type MAX_RAY_LENGTH = DBL_MAX;
+constexpr vec_type EPSILON = DBL_EPSILON;
+constexpr vec_type SURFACE_EPSILON = 30 * EPSILON;
+constexpr vec_type MAX_RAY_LENGTH = DBL_MAX;
 
 #else
 using vec_type = float;
-_DEVHOST constexpr vec_type EPSILON = FLT_EPSILON * 30;
-_DEVHOST constexpr vec_type SURFACE_EPSILON = 30 * EPSILON;
-_DEVHOST constexpr vec_type MAX_RAY_LENGTH = FLT_MAX;
+constexpr vec_type EPSILON = FLT_EPSILON * 30;
+constexpr vec_type SURFACE_EPSILON = 30 * EPSILON;
+constexpr vec_type MAX_RAY_LENGTH = FLT_MAX;
 
 #endif
     // TEMPLATE CLASS is_tracable_container
@@ -36,7 +36,7 @@ template <class _Ty>
 template <typename _Ty,
     typename = enable_if_t<is_integral<_Ty>::value>>
     _DEVHOST void little_endian_insert(_Ty t, size_t size, _vector<char> &bytes, size_t offset) {
-        const uint16_t byte_mask = 255;
+        const unsigned int byte_mask = 255;
         while (size--) {
             bytes[offset++] = static_cast<char>(t & byte_mask);
             t = t >> 8;
