@@ -11,9 +11,9 @@
 #include "arithmetic_tuple.h"
 
 _RTC_BEGIN
-    _DEVHOST static constexpr int COL_LOG_RADIX = 8;
-    _DEVHOST static constexpr int COL_RADIX = 1 << COL_LOG_RADIX;
-    _DEVHOST static constexpr int COL_RADIX_MASK = COL_RADIX - 1;
+    constexpr unsigned int COL_LOG_RADIX = 8;
+    constexpr unsigned int COL_RADIX = 1 << COL_LOG_RADIX;
+    constexpr unsigned int COL_RADIX_MASK = COL_RADIX - 1;
 
     // ALIAS TEMPLATE byte_color
 template <size_t BPP>
@@ -63,17 +63,22 @@ template <size_t BPP>
 template <size_t BPP>
     class color : public arithmetic_tuple<vec_type, BPP> {
     private:
-        using _Mybase =  arithmetic_tuple<vec_type, BPP>;
-
         _DEVHOST char coord_to_char(const vec_type& x) const {
-            return (char)(((static_cast<vec_type>(2) / (exp(-x) + static_cast<vec_type>(1))) - static_cast<vec_type>(1)) * COL_RADIX);
+            return (char)(((static_cast<vec_type>(2) / 
+                (exp(-x) + static_cast<vec_type>(1))) - 
+                static_cast<vec_type>(1)) * COL_RADIX);
         }
 
         _DEVHOST vec_type char_to_coord(const char& x) const {
-            return -log(static_cast<vec_type>(2) / (x / static_cast<vec_type>(COL_RADIX) + static_cast<vec_type>(1)) - static_cast<vec_type>(1));
+            return -log(static_cast<vec_type>(2) / 
+                (x / static_cast<vec_type>(COL_RADIX) + 
+                static_cast<vec_type>(1)) - static_cast<vec_type>(1));
         }
 
     public:
+        using _Mybase = arithmetic_tuple<vec_type, BPP>;
+        using _Mytype = color<BPP>;
+
         _DEVHOST color() : _Mybase() {}
 
         _DEVHOST color(const vec_type *arr) : _Mybase(arr) {}
@@ -97,9 +102,9 @@ template <size_t BPP>
             return ret;
         }
 
-    template <typename... Type,
-        typename = std::enable_if_t<are_convertible<vec_type, Type...>::value && sizeof...(Type) == BPP>>
-        _DEVHOST color(Type... vals) : _Mybase() {
+    template <typename... _Args,
+        typename = enable_if_t<are_convertible<vec_type, _Args...>::value && sizeof...(_Args) == BPP>>
+        _DEVHOST color(_Args... vals) : _Mybase() {
             this->values = { static_cast<vec_type>(vals)... };
         }
 
