@@ -3,7 +3,6 @@
 
 #include <fstream>
 
-#include "defs.h"
 #include "rtc.h"
 #include "exception.h"
 #include "color.h"
@@ -20,6 +19,8 @@ template <size_t BPP>
     public:
         using _Mytype = bitmap<BPP>;
 
+        _DEVHOST bitmap() {}
+
         _DEVHOST bitmap(size_t width, size_t height)
             : data(), 
             width(width),
@@ -31,25 +32,25 @@ template <size_t BPP>
             data[0] = 'B';  
             data[1] = 'M';
                 // file size bytes
-            little_endian_insert<size_t>(data.size(), 4, data, 2); 
+            little_endian_insert(data.size(), 4, data, 2); 
                 // offset
-            little_endian_insert<size_t>(14 + 40, 4, data, 10); 
+            little_endian_insert(14 + 40, 4, data, 10); 
 
             // BITMAPINFOHEADER 
                 // the size of this header
-            little_endian_insert<size_t>(40, 4, data, 14); 
+            little_endian_insert(40, 4, data, 14); 
                 // the bitmap width in pixels
-            little_endian_insert<size_t>(width, 4, data, 18); 
+            little_endian_insert(width, 4, data, 18); 
                 // the bitmap height in pixels
-            little_endian_insert<size_t>(height, 4, data, 22); 
+            little_endian_insert(height, 4, data, 22); 
                 // the number of color planes
-            little_endian_insert<size_t>(1, 2, data, 26); 
+            little_endian_insert(1, 2, data, 26); 
                 // the number of bits per pixel
-            little_endian_insert<size_t>(BPP * 8, 2, data, 28); 
+            little_endian_insert((BPP * 8), 2, data, 28); 
                 // horizontal resolution
-            little_endian_insert<size_t>(2835, 4, data, 38);
+            little_endian_insert(2835, 4, data, 38);
                 // vertical resolution
-            little_endian_insert<size_t>(2835, 4, data, 42); 
+            little_endian_insert(2835, 4, data, 42); 
         }
 
         _HOST bitmap(const char* filename) { read(filename); }
