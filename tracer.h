@@ -90,7 +90,7 @@ namespace rtc {
         }
 
     template <typename... Types, 
-        typename = std::enable_if_t<sizeof...(Types) == N - 1 && are_convertible<vec_type, Types...>::value>>
+        typename = enable_if_t<sizeof...(Types) == N - 1 && are_convertible<vec_type, Types...>::value>>
         color<BPP> trace_from_camera(const Types&... screen_pos) const {
             return trace_ray(cam.get_ray(screen_pos...));
         }
@@ -105,19 +105,19 @@ namespace rtc {
         
     template <size_t samples_per_pixel = 1,
         typename... Types, 
-        typename = std::enable_if_t<N >= 3 && sizeof...(Types) == N - 1 && are_convertible<size_t, Types...>::value>>
-        std::vector<bitmap<BPP>> draw_bitmap(Types... dims) {
+        typename = enable_if_t<N >= 3 && sizeof...(Types) == N - 1 && are_convertible<size_t, Types...>::value>>
+        _vector<bitmap<BPP>> draw_bitmap(Types... dims) {
             std::random_device rd;
             std::mt19937 mt(rd());
             std::uniform_real_distribution<vec_type> dist(0, 1);
 
-            std::array<size_t, N - 1> dims_arr = { static_cast<size_t>(dims)... };
+            _array<size_t, N - 1> dims_arr = { static_cast<size_t>(dims)... };
             size_t ret_len = dims_arr[0] * dims_arr[1];
             for (size_t i = 2; i < N - 1; ++i)
                 ret_len *= dims_arr[i];
-            std::vector<bitmap<BPP>> ret;
+            _vector<bitmap<BPP>> ret;
             init_sample();
-            std::array<vec_type, samples_per_pixel> random_vector;
+            _array<vec_type, samples_per_pixel> random_vector;
             for (size_t smp = 0; smp < samples_per_pixel; ++smp)
                 random_vector[smp] = dist(mt);
 
@@ -127,7 +127,7 @@ namespace rtc {
                     for (size_t y = 0; y < dims_arr[1]; ++y) {
                         color<BPP> sample_col;
                         for (size_t smp = 0; smp < samples_per_pixel; ++smp) {
-                            std::array<vec_type, N - 1> screen_coord;
+                            _array<vec_type, N - 1> screen_coord;
                             size_t c = i;
                             screen_coord[0] = (static_cast<vec_type>(x + random_vector[smp]) / dims_arr[0] - (vec_type)0.5) * (vec_type)2;
                             screen_coord[1] = (static_cast<vec_type>(y + random_vector[smp]) / dims_arr[1] - (vec_type)0.5) * (vec_type)2;
