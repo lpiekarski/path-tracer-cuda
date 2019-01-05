@@ -4,21 +4,21 @@
 #include "rtc.h"
 
 _RTC_BEGIN
-template <size_t N,
+template <size_t _Dims,
     size_t BPP>
     class tracable {
     public:
-        virtual bool ray_intersection(const ray<N>& r,
+        _DEVHOST virtual bool ray_intersection(const ray<_Dims>& r,
             vec_type& intersection_dist) = 0;
 
-        virtual color<BPP> ambient_color(const ray<N>& r,
-            const vector<N>& intersection_point) = 0;
+        _DEVHOST virtual color<BPP> ambient_color(const ray<_Dims>& r,
+            const vector<_Dims>& intersection_point) = 0;
 
-        virtual color<BPP> diffuse_color(const ray<N>& r,
-            const vector<N>& intersection_point) = 0;
+        _DEVHOST virtual color<BPP> diffuse_color(const ray<_Dims>& r,
+            const vector<_Dims>& intersection_point) = 0;
 
-        virtual ray<N> get_reflection(const ray<N>& r,
-            const vector<N>& intersection_point) = 0;
+        _DEVHOST virtual ray<_Dims> get_reflection(const ray<_Dims>& r,
+            const vector<_Dims>& intersection_point) = 0;
 };
 _RTC_END
 
