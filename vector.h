@@ -7,53 +7,53 @@
 
 _RTC_BEGIN
     // ALIAS TEMPLATE vector
-template <size_t N>
-    using vector = arithmetic_tuple<vec_type, N>;
+template <size_t _Dims>
+    using vector = arithmetic_tuple<vec_type, _Dims>;
 
     using vec3 = vector<3>;
 
     using vec2 = vector<2>;
 
     // FUNCTION TEMPLATE dot
-template <size_t N>
-    _DEVHOST vec_type dot(const vector<N>& v1,
-        const vector<N>& v2) {
+template <size_t _Dims>
+    _DEVHOST vec_type dot(const vector<_Dims>& v1,
+        const vector<_Dims>& v2) {
         vec_type ret = 0;
-        for (size_t i = 0; i < N; ++i)
+        for (size_t i = 0; i < _Dims; ++i)
             ret += v1[i] * v2[i];
         return ret;
     }
 
     // FUNCTION TEMPLATE len2
-template <size_t N>
-    _DEVHOST vec_type len2(const vector<N>& v1) {
+template <size_t _Dims>
+    _DEVHOST vec_type len2(const vector<_Dims>& v1) {
         return dot(v1, v1);
     }
 
     // FUNCTION TEMPLATE len
-template <size_t N>
-    _DEVHOST vec_type len(const vector<N>& v1) {
+template <size_t _Dims>
+    _DEVHOST vec_type len(const vector<_Dims>& v1) {
         return sqrt(len2(v1));
     }
 
     // FUNCTION TEMPLATE dist2
-template <size_t N>
-    _DEVHOST vec_type dist2(const vector<N>& v1,
-        const vector<N>& v2) {
+template <size_t _Dims>
+    _DEVHOST vec_type dist2(const vector<_Dims>& v1,
+        const vector<_Dims>& v2) {
         return len2(v1 - v2);
     }
 
     // FUNCTION TEMPLATE dist
-template <size_t N>
-    _DEVHOST vec_type dist(const vector<N>& v1,
-        const vector<N>& v2) {
+template <size_t _Dims>
+    _DEVHOST vec_type dist(const vector<_Dims>& v1,
+        const vector<_Dims>& v2) {
         return len(v1 - v2);
     }
 
     // FUNCTION TEMPLATE cross
-template <size_t N>
-    _DEVHOST vector<N> cross(const vector<N>& v1,
-        const vector<N>& v2) {
+template <size_t _Dims>
+    _DEVHOST vector<_Dims> cross(const vector<_Dims>& v1,
+        const vector<_Dims>& v2) {
         throw std::exception("unimplemented function");
     }
 
@@ -66,10 +66,10 @@ template <size_t N>
     }
 
     // CLASS TEMPLATE normal
-template <size_t N>
-    class normal : public vector<N> {
+template <size_t _Dims>
+    class normal : public vector<_Dims> {
     private:
-        using _Mybase = vector<N>;
+        using _Mybase = vector<_Dims>;
 
     template <typename... P>
         _DEVHOST void normalize(P... args) {
@@ -78,13 +78,13 @@ template <size_t N>
             vec_type ln = len(*this);
             if (ln == 0)
                 throw ZeroNormalVector();
-            for (size_t i = 0; i < N; ++i)
+            for (size_t i = 0; i < _Dims; ++i)
                 this->values[i] /= ln;
         }
 
     public:
         _DEVHOST normal()
-            : _Mybase(unit_vector<N>(0)) {}
+            : _Mybase(unit_vector<_Dims>(0)) {}
 
     template <typename... P>
         _DEVHOST normal(P... args) 
@@ -96,41 +96,41 @@ template <size_t N>
     using normal3 = normal<3>;
 
     // FUNCTION TEMPLATE rotate
-template <size_t N>
-    _DEVHOST vector<N> rotate(vector<N> v,
-        normal<N> axis) {
+template <size_t _Dims>
+    _DEVHOST vector<_Dims> rotate(vector<_Dims> v,
+        normal<_Dims> axis) {
         throw std::exception("unimplemented function");
     }
 
     // FUNCTION TEMPLATE reflect
-template <size_t N>
-    _DEVHOST normal<N> reflect(const vector<N>& i,
-        const normal<N>& n) {
+template <size_t _Dims>
+    _DEVHOST normal<_Dims> reflect(const vector<_Dims>& i,
+        const normal<_Dims>& n) {
         return i - (static_cast<vec_type>(2) * dot(n, i) * n);
     }
 
     // FUNCTION TEMPLATE unit_vector
-template <size_t N>
-    _DEVHOST normal<N> unit_vector(size_t i) {
-        vector<N> ret;
+template <size_t _Dims>
+    _DEVHOST normal<_Dims> unit_vector(size_t i) {
+        vector<_Dims> ret;
         ret[i] = 1;
         return ret;
     }
 
     // FUNCTION TEMPLATE standard_base
-template <size_t N>
-    _array<normal<N>, N> standard_base() {
-        _array<normal<N>, N> ret;
-        for (size_t i = 0; i < N; ++i)
-            ret[i] = unit_vector<N>(i);
+template <size_t _Dims>
+    _array<normal<_Dims>, _Dims> standard_base() {
+        _array<normal<_Dims>, _Dims> ret;
+        for (size_t i = 0; i < _Dims; ++i)
+            ret[i] = unit_vector<_Dims>(i);
         return ret;
     }
 
     // FUNCTION TEMPLATE from_value
-template <size_t N>
-    vector<N> from_value(const vec_type& val) {
-        vector<N> ret;
-        for (size_t i = 0; i < N; ++i)
+template <size_t _Dims>
+    vector<_Dims> from_value(const vec_type& val) {
+        vector<_Dims> ret;
+        for (size_t i = 0; i < _Dims; ++i)
             ret[i] = val;
         return ret;
     }
