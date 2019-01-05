@@ -5,7 +5,7 @@
 
 #include "rtc.h"
 #include "bitmap.h"
-
+//TODO: replace shared pointers with c style pointers
 _RTC_BEGIN
     // CLASS TEMPLATE material
 template <size_t BPP>
