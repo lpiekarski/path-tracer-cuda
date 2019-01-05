@@ -10,10 +10,8 @@
 #endif
 
 #include "dh_array.h"
-#include <vector>
 #include "dh_vector.h"
 
-_RTC_BEGIN
 #ifdef RTC_USE_CUDA
 #include <cuda_runtime.h>
 #define _DEVICE __device__
@@ -25,8 +23,9 @@ _RTC_BEGIN
 #define _DEVHOST
 #endif
 
+_RTC_BEGIN
 template <typename _Ty>
-    using _vector = std::vector<_Ty>;//dh_vector<_Ty>;
+    using _vector = dh_vector<_Ty>;
 
 template <typename _Ty, size_t _Size>
     using _array = dh_array<_Ty, _Size>;
