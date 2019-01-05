@@ -11,8 +11,19 @@ _RTC_BEGIN
 template <size_t BPP>
     class material {
     private:
-        std::shared_ptr<bitmap<BPP>> diffuse, ambient, reflection, refraction, normal;
+        bitmap<BPP> *diffuse,
+            *ambient,
+            *reflection,
+            *refraction, 
+            *normal;
+            //subsurface
     public:
+        _DEVHOST material() 
+            : diffuse(nullptr),
+            ambient(nullptr),
+            reflection(nullptr),
+            refraction(nullptr),
+            normal(nullptr) {}
     };
 _RTC_END
 
