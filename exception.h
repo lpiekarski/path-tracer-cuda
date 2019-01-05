@@ -5,7 +5,6 @@
 
 #include "rtc.h"
 
-
 _RTC_BEGIN
 class IndexOutOfBounds : public std::exception {
 public:
@@ -20,6 +19,12 @@ public:
         return "ZeroNormalVector";
     }
 };
+
+#ifdef __CUDA_ARCH__
+#define throw_exc(E)
+#else /* !__CUDA_ARCH__ */
+#define throw_exc(E) throw E
+#endif /* __CUDA_ARCH__ */
 _RTC_END
 
 #endif /* __EXCEPTION_H__ */
