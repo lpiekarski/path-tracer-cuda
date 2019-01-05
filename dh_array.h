@@ -38,6 +38,14 @@ template <typename _Ty, size_t _Size>
             return arr[idx];
         }
 
+        _DEVHOST _Ty* data() {
+            return arr;
+        }
+
+        _DEVHOST const _Ty* data() const {
+            return arr;
+        }
+
         _DEVHOST constexpr size_t size() const noexcept {
             return _Size;
         }
