@@ -1,185 +1,194 @@
 #ifndef __ARITHMETIC_TUPLE_H__
 #define __ARITHMETIC_TUPLE_H__
 
-#include <vector>
-#include <type_traits>
-#include <array>
-#include <tuple>
-
 #include "rtc.h"
 #include "exception.h"
 
 _RTC_BEGIN
     // CLASS TEMPLATE arithmetic_tuple
-template <typename T,
-    size_t N>
+template <typename _Ty,
+    size_t _Size>
     class arithmetic_tuple {
     protected:
-        _array<T, N> values;
+        _array<_Ty, _Size> values;
     
     public:
-        arithmetic_tuple() 
+        using value_type = _Ty;
+        using _Mytype = arithmetic_tuple<_Ty, _Size>;
+
+        _DEVHOST arithmetic_tuple()
             : values() {}
 
-        template <typename... Type,
-            typename = std::enable_if_t<are_arithmetic<Type...>::value && sizeof...(Type) == N>>
-            arithmetic_tuple(Type... vals) {
-            values = { static_cast<T>(vals)... };
+        template <typename... _Args,
+            typename = enable_if_t<are_arithmetic<_Args...>::value && sizeof...(_Args) == _Size>>
+            _DEVHOST arithmetic_tuple(_Args... args) {
+            values = { static_cast<_Ty>(args)... };
         }
 
-        arithmetic_tuple(const T *arr) 
+        _DEVHOST arithmetic_tuple(const _Ty *_Arr)
             : values() {
-            for (size_t i = 0; i < N; ++i)
-                values[i] = arr[i];
+            for (size_t i = 0; i < _Size; ++i)
+                values[i] = _Arr[i];
         }
 
-        arithmetic_tuple(const arithmetic_tuple<T, N>& other) 
+        _DEVHOST arithmetic_tuple(const _Mytype& other)
             : values(other.values) {}
 
-        arithmetic_tuple<T, N>& operator=(const arithmetic_tuple<T, N>& other) {
+        _DEVHOST _Mytype& operator=(const _Mytype& other) {
             values = other.values;
             return *this;
         }
 
-    template <typename P,
-        typename = std::enable_if_t<std::is_convertible<P, T>::value>>
-        operator arithmetic_tuple<P, N>() const {
-            arithmetic_tuple<P, N> ret;
-            for (size_t i = 0; i < N; ++i)
-                ret[i] = (P)values[i];
+    template <typename _Conv,
+        typename = enable_if_t<is_convertible<_Conv, _Ty>::value>>
+        _DEVHOST operator arithmetic_tuple<_Conv, _Size>() const {
+            arithmetic_tuple<_Conv, _Size> ret;
+            for (size_t i = 0; i < _Size; ++i)
+                ret[i] = (_Conv)values[i];
             return ret;
         }
-
-        T operator[](size_t idx) const {
-            if (idx >= N)
-                throw IndexOutOfBounds();
+#ifdef RTC_USE_CUDA
+    template <typename... _Args>
+    //typename = enable_if_t<is_constructible<_Mytype, _Args...>::value>
+        _HOST static _Mytype* device_ctr(_Args... args) {
+            _Mytype h_ret(args...);
+            _Mytype *d_ret_ptr;
+            size_t sz = sizeof(_Mytype);
+            cudaMalloc((void**)&d_ret_ptr, sz);
+            cudaMemcpy(d_ret_ptr, &h_ret, sz, cudaMemcpyHostToDevice);
+            return d_ret_ptr;
+        }
+#endif /* RTC_USE_CUDA */
+        _DEVHOST _Ty operator[](size_t idx) const {
+            if (idx >= _Size)
+                throw_exc(IndexOutOfBounds());
             return values[idx];
         }
 
-        T& operator[](size_t idx) {
-            if (idx >= N)
-                throw IndexOutOfBounds();
+        _DEVHOST _Ty& operator[](size_t idx) {
+            if (idx >= _Size)
+                throw_exc(IndexOutOfBounds());
             return values[idx];
         }
 
-        friend bool operator==(const arithmetic_tuple<T, N>& t1,
-            const arithmetic_tuple<T, N>& t2) {
-            for (size_t i = 0; i < N; ++i)
+        _DEVHOST friend bool operator==(const _Mytype& t1,
+            const _Mytype& t2) {
+            for (size_t i = 0; i < _Size; ++i)
                 if (t1[i] != t2[i])
                     return false;
             return true;
         }
 
-        friend bool operator!=(const arithmetic_tuple<T, N>& t1,
-            const arithmetic_tuple<T, N>& t2) {
-            for (size_t i = 0; i < N; ++i)
+        _DEVHOST friend bool operator!=(const _Mytype& t1,
+            const _Mytype& t2) {
+            for (size_t i = 0; i < _Size; ++i)
                 if (t1[i] != t2[i])
                     return true;
             return false;
         }
 
-        friend bool operator>=(const arithmetic_tuple<T, N>& t1,
-            const arithmetic_tuple<T, N>& t2) {
-            for (size_t i = 0; i < N; ++i)
+        _DEVHOST friend bool operator>=(const _Mytype& t1,
+            const _Mytype& t2) {
+            for (size_t i = 0; i < _Size; ++i)
                 if (t1[i] < t2[i])
                     return false;
             return true;
         }
 
-        friend bool operator<=(const arithmetic_tuple<T, N>& t1,
-            const arithmetic_tuple<T, N>& t2) {
-            for (size_t i = 0; i < N; ++i)
+        _DEVHOST friend bool operator<=(const _Mytype& t1,
+            const _Mytype& t2) {
+            for (size_t i = 0; i < _Size; ++i)
                 if (t1[i] > t2[i])
                     return false;
             return true;
         }
 
-        friend bool operator>(const arithmetic_tuple<T, N>& t1,
-            const arithmetic_tuple<T, N>& t2) {
-            for (size_t i = 0; i < N; ++i)
+        _DEVHOST friend bool operator>(const _Mytype& t1,
+            const _Mytype& t2) {
+            for (size_t i = 0; i < _Size; ++i)
                 if (t1[i] <= t2[i])
                     return false;
             return true;
         }
 
-        friend bool operator<(const arithmetic_tuple<T, N>& t1,
-            const arithmetic_tuple<T, N>& t2) {
-            for (size_t i = 0; i < N; ++i)
+        _DEVHOST friend bool operator<(const _Mytype& t1,
+            const _Mytype& t2) {
+            for (size_t i = 0; i < _Size; ++i)
                 if (t1[i] >= t2[i])
                     return false;
             return true;
         }
 
-        friend arithmetic_tuple<T, N> operator+(const arithmetic_tuple<T, N>& t1,
-            const T& n) {
-            arithmetic_tuple<T, N> ret;
-            for (size_t i = 0; i < N; ++i)
+        _DEVHOST friend _Mytype operator+(const _Mytype& t1,
+            const _Ty& n) {
+            _Mytype ret;
+            for (size_t i = 0; i < _Size; ++i)
                 ret[i] = t1[i] + n;
             return ret;
         }
 
-        friend arithmetic_tuple<T, N> operator+(const T& n,
-            const arithmetic_tuple<T, N>& t2) {
+        _DEVHOST friend _Mytype operator+(const _Ty& n,
+            const _Mytype& t2) {
             return t2 + n;
         }
             
-        friend arithmetic_tuple<T, N> operator+(const arithmetic_tuple<T, N>& t1,
-            const arithmetic_tuple<T, N>& t2) {
-            arithmetic_tuple<T, N> ret;
-            for (size_t i = 0; i < N; ++i)
+        _DEVHOST friend _Mytype operator+(const _Mytype& t1,
+            const _Mytype& t2) {
+            _Mytype ret;
+            for (size_t i = 0; i < _Size; ++i)
                 ret[i] = t1[i] + t2[i];
             return ret;
         }
 
-        friend arithmetic_tuple<T, N> operator-(const arithmetic_tuple<T, N>& t1,
-            const T& n) {
-            arithmetic_tuple<T, N> ret;
-            for (size_t i = 0; i < N; ++i)
+        _DEVHOST friend _Mytype operator-(const _Mytype& t1,
+            const _Ty& n) {
+            _Mytype ret;
+            for (size_t i = 0; i < _Size; ++i)
                 ret[i] = t1[i] - n;
             return ret;
         }
 
-        friend arithmetic_tuple<T, N> operator-(const T& n,
-            const arithmetic_tuple<T, N>& t1) {
-            arithmetic_tuple<T, N> ret;
-            for (size_t i = 0; i < N; ++i)
+        _DEVHOST friend _Mytype operator-(const _Ty& n,
+            const _Mytype& t1) {
+            arithmetic_tuple<_Ty, _Size> ret;
+            for (size_t i = 0; i < _Size; ++i)
                 ret[i] = n - t1[i];
             return ret;
         }
 
-        friend arithmetic_tuple<T, N> operator-(const arithmetic_tuple<T, N>& t1,
-            const arithmetic_tuple<T, N>& t2) {
-            arithmetic_tuple<T, N> ret;
-            for (size_t i = 0; i < N; ++i)
+        _DEVHOST friend _Mytype operator-(const _Mytype& t1,
+            const _Mytype& t2) {
+            _Mytype ret;
+            for (size_t i = 0; i < _Size; ++i)
                 ret[i] = t1[i] - t2[i];
             return ret;
         }
 
-        friend arithmetic_tuple<T, N> operator*(const arithmetic_tuple<T, N>& t1,
-            const T& n) {
-            arithmetic_tuple<T, N> ret;
-            for (size_t i = 0; i < N; ++i)
+        _DEVHOST friend _Mytype operator*(const _Mytype& t1,
+            const _Ty& n) {
+            _Mytype ret;
+            for (size_t i = 0; i < _Size; ++i)
                 ret[i] = t1[i] * n;
             return ret;
         }
 
-        friend arithmetic_tuple<T, N> operator/(const arithmetic_tuple<T, N>& t1,
-            const T& n) {
-            arithmetic_tuple<T, N> ret;
-            for (size_t i = 0; i < N; ++i)
+        _DEVHOST friend _Mytype operator/(const _Mytype& t1,
+            const _Ty& n) {
+            _Mytype ret;
+            for (size_t i = 0; i < _Size; ++i)
                 ret[i] = t1[i] / n;
             return ret;
         }
 
-        friend arithmetic_tuple<T, N> operator*(const T& n,
-            const arithmetic_tuple<T, N>& t1) {
+        _DEVHOST friend _Mytype operator*(const _Ty& n,
+            const _Mytype& t1) {
             return t1 * n;
         }
 
-        friend arithmetic_tuple<T, N> operator*(const arithmetic_tuple<T, N>& t1,
-            const arithmetic_tuple<T, N>& t2) {
-            arithmetic_tuple<T, N> ret;
-            for (size_t i = 0; i < N; ++i)
+        _DEVHOST friend _Mytype operator*(const _Mytype& t1,
+            const _Mytype& t2) {
+            _Mytype ret;
+            for (size_t i = 0; i < _Size; ++i)
                 ret[i] = t1[i] * t2[i];
             return ret;
         }
