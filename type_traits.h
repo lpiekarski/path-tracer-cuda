@@ -175,15 +175,15 @@ template <>
 template <>
     struct _Is_integral<char32_t>
         : true_type {};
-/*
+
 template <>
-    struct _Is_integral<_LONGLONG>
+    struct _Is_integral<long long>
         : true_type {};
 
 template <>
-    struct _Is_integral<_ULONGLONG>
+    struct _Is_integral<unsigned long long>
         : true_type {};
-*/
+
     // TEMPLATE CLASS is_integral
 template <class _Ty>
     struct is_integral
