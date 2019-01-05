@@ -29,6 +29,16 @@ template <typename _Ty>
                 arr[i] = other.arr[i];
         }
 
+        _DEVHOST dh_vector& operator=(const dh_vector& other) {
+            delete[] arr;
+            arr = new _Ty[other.arr_length];
+            arr_length = other.arr_length;
+            sz = other.sz;
+            for (size_t i = 0; i < sz; ++i)
+                arr[i] = other.arr[i];
+            return *this;
+        }
+
         _DEVHOST ~dh_vector() {
             delete[] arr;
         }
@@ -42,9 +52,22 @@ template <typename _Ty>
                 new_arr[i] = arr[i];
             delete[] arr;
             arr_length = new_size;
-            if (sz > arr_length)
-                sz = arr_length;
+            sz = new_size;
             arr = new_arr;
+            for (size_t i = copy_length; i < sz; ++i)
+                arr[i] = 0;
+        }
+
+        _DEVHOST void clear() {
+            sz = 0;
+        }
+
+        _DEVHOST _Ty* data() {
+            return arr;
+        }
+
+        _DEVHOST const _Ty* data() const {
+            return arr;
         }
 
         //TODO: make thread safe
