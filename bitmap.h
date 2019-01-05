@@ -1,14 +1,7 @@
 #ifndef __BITMAP_H__
 #define __BITMAP_H__
 
-#include <cassert>
-#include <exception>
 #include <fstream>
-#include <type_traits>
-#include <vector>
-#include <mutex>
-
-#include <iostream>
 
 #include "defs.h"
 #include "rtc.h"
@@ -25,6 +18,8 @@ template <size_t BPP>
         size_t width, height;
 
     public:
+        using _Mytype = bitmap<BPP>;
+
         _DEVHOST bitmap(size_t width, size_t height)
             : data(), 
             width(width),
@@ -123,6 +118,19 @@ template <size_t BPP>
             delete[] buf;
             return true;
         }
+
+#ifdef RTC_USE_CUDA
+        template <typename... _Args>
+        //typename = enable_if_t<is_constructible<_Mytype, _Args...>::value>
+        _HOST static _Mytype* device_ctr(_Args... args) {
+            _Mytype h_ret(args...);
+            _Mytype *d_ret_ptr;
+            size_t sz = sizeof(_Mytype);
+            cudaMalloc((void**)&d_ret_ptr, sz);
+            cudaMemcpy(d_ret_ptr, &h_ret, sz, cudaMemcpyHostToDevice);
+            return d_ret_ptr;
+        }
+#endif /* RTC_USE_CUDA */
     };
 _RTC_END
 
