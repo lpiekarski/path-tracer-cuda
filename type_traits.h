@@ -273,34 +273,34 @@ template <class... _Lty>
 #if _HAS_CXX17
 template <class _Ty,
     class _Uty>
-    _DEVHOST inline constexpr bool is_same_v = is_same<_Ty, _Uty>::value;
+    inline constexpr bool is_same_v = is_same<_Ty, _Uty>::value;
 
 template <class _Ty>
-    _DEVHOST inline constexpr bool is_integral_v = is_integral<_Ty>::value;
+    inline constexpr bool is_integral_v = is_integral<_Ty>::value;
 
 template <class _Ty>
-    _DEVHOST inline constexpr bool is_floating_point_v = is_floating_point<_Ty>::value;
+    inline constexpr bool is_floating_point_v = is_floating_point<_Ty>::value;
 
 template <class _Ty>
-    _DEVHOST inline constexpr bool is_arithmetic_v = is_arithmetic<_Ty>::value;
+    inline constexpr bool is_arithmetic_v = is_arithmetic<_Ty>::value;
 
 template <template <class> class _Test,
     class... _Lty>
-    _DEVHOST inline constexpr bool for_all_v = for_all<_Test, _Lty...>::value;
+    inline constexpr bool for_all_v = for_all<_Test, _Lty...>::value;
 
 template <class _Ty,
     class... _Lty>
-    _DEVHOST inline constexpr bool are_same_v = are_same<_Ty, _Lty...>::value;
+    inline constexpr bool are_same_v = are_same<_Ty, _Lty...>::value;
 
 template <class _To,
     class... _Lty>
-    _DEVHOST inline constexpr bool are_convertible_v = are_convertible<_To, _Lty...>::value;
+    inline constexpr bool are_convertible_v = are_convertible<_To, _Lty...>::value;
 
 template <class... _Lty>
-    _DEVHOST inline constexpr bool are_arithmetic_v = for_all_v<is_arithmetic, _Lty...>;
+    inline constexpr bool are_arithmetic_v = for_all_v<is_arithmetic, _Lty...>;
 
 template <class _Ty>
-    _DEVHOST inline constexpr bool is_tracable_container_v = is_tracable_container<_Ty>::value;
+    inline constexpr bool is_tracable_container_v = is_tracable_container<_Ty>::value;
 #endif /* _HAS_CXX17 */
 _RTC_END
 
