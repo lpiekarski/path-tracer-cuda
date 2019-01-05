@@ -102,7 +102,6 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     <ClInclude Include="exception.h" />
     <ClInclude Include="material.h" />
     <ClInclude Include="matrix.h" />
-    <ClInclude Include="memory.h" />
     <ClInclude Include="ray.h" />
     <ClInclude Include="rtc.h" />
     <ClInclude Include="tclist.h" />
