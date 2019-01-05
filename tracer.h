@@ -5,6 +5,10 @@
 #include <random>
 #include <type_traits>
 #ifdef RTC_TIMER
+#ifdef RTC_USE_CUDA
+#define init_sample()
+#define add_sample()
+#else
 #include <chrono>
 #include <iostream>
 
@@ -22,8 +26,8 @@
             samples = 0; \
         } \
     }
-
-#else /* ! RTC_TIMER */
+#endif
+#else
 #define init_sample()
 #define add_sample()
 #endif 
