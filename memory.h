@@ -1,6 +1,6 @@
 #ifndef __MEMORY_H__
 #define __MEMORY_H__
-
+#pragma _CRT_WARNING("remove memory.h from usage")
 #include "defs.h"
 
 #include <iostream>
@@ -35,7 +35,7 @@ _RTC_BEGIN
         }
     };
 
-    _DEVHOST _array<_vector<_Ptr_handler>, HASH_SIZE> _Handlers;
+    _array<_vector<_Ptr_handler>, HASH_SIZE> _Handlers;
 
 template <class _Ty>
     class shared_ptr {
