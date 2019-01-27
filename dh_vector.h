@@ -5,8 +5,7 @@ _RTC_BEGIN
 #define DH_VEC_DEFAULT_LENGTH 1
 #define DH_VEC_SCALE_UP 2
 #define DH_VEC_SCALE_DOWN 4
-//TODO: make dh_vector thread safe
-//TODO: add device_ctr
+
 template <typename _Ty>
     class dh_vector {
     private:
@@ -114,6 +113,21 @@ template <typename _Ty>
         _DEVHOST _Ty& operator[](size_t idx) {
             return arr[idx];
         }
+        //TODO test
+#ifdef RTC_USE_CUDA
+    template <typename... _Args>
+        typename = enable_if_t<is_constructible<dh_array<_Ty, _Size>, _Args...>
+            _HOST static _Mytype* device_ctr(_Args... args) {
+            _Mytype h_ret(args...);
+            _Mytype *d_ret_ptr;
+            size_t sz = sizeof(_Mytype);
+            cudaMalloc((void**)&d_ret_ptr, sz);
+            cudaMemcpy(d_ret_ptr, &h_ret, sz, cudaMemcpyHostToDevice);
+            cudaMalloc((void**)&d_ret_ptr->arr, sizeof(h_ret.arr));
+            cudaMemcpy(d_ret_ptr->arr, &h_ret.arr, sizeof(h_ret.arr), cudaMemcpyHostToDevice);
+            return d_ret_ptr;
+        }
+#endif /* RTC_USE_CUDA */
     };
 _RTC_END
 
