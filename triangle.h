@@ -7,6 +7,10 @@
 #include "rtc.h"
 #include "tracable.h"
 #include "vector.h"
+#include "material.h"
+
+#define DEFAULT_AMBIENT(BPP) (gray<BPP>(0))
+#define DEFAULT_DIFFUSE(BPP) (gray<BPP>(1))
 
 // triangle data:
 // - shared 3 vertices
@@ -18,69 +22,48 @@
 // - refraction map coords
 // - ambient map coords
 _RTC_BEGIN
-template <size_t N,
+template <size_t _Dims,
     size_t BPP>
-    class triangle : public tracable<N, BPP> {
+    class triangle : public tracable<_Dims, BPP> {
     private:
-        std::array<std::shared_ptr<vector<N>>, 3> vertices;
-        color<BPP> ambient, diffuse;
-        //TODO: array of normal vectors' shared pointers
+        _array<vector<_Dims>*, 3> vertices;
+        material* mat;
 
-        normal<N> get_normal() {
-            normal<N> n = cross((*vertices[1]) - (*vertices[0]), (*vertices[2]) - (*vertices[0]));
-            return n;
+        _DEVHOST normal<_Dims> get_normal() {
+            return cross((*vertices[1]) - (*vertices[0]), (*vertices[2]) - (*vertices[0]));
         }
 
     public:
-        triangle() 
-            : tracable<N, BPP>(),
-            ambient(color<BPP>()),
-            diffuse(white<BPP>()) {}
+        _DEVHOST triangle() 
+            : tracable<_Dims, BPP>()
+            vertices(),
+            mat(nullptr) {}
 
-        triangle(std::shared_ptr<vector<N>> v1,
-            std::shared_ptr<vector<N>> v2,
-            std::shared_ptr<vector<N>> v3) 
-            : tracable<N, BPP>(),
-            ambient(color<BPP>()),
-            diffuse(white<BPP>()) {
-            vertices = { v1, v2, v3 };
+        _DEVHOST triangle(vector<_Dims>* v1,
+            vector<_Dims>* v2,
+            vector<_Dims>* v3) 
+            : tracable<_Dims, BPP>(),
+            vertices(v1, v2, v3),
+            mat(nullptr) {}
+
+        _DEVHOST triangle& set_material(material* _Material) {
+            mat = _Material;
+            return *this;
         }
 
-        triangle(const color<BPP>& ambient,
-            const color<BPP>& diffuse)
-            : tracable<N, BPP>(),
-            ambient(ambient),
-            diffuse(diffuse) {}
-
-        triangle(std::shared_ptr<vector<N>> v1,
-            std::shared_ptr<vector<N>> v2,
-            std::shared_ptr<vector<N>> v3,
-            const color<BPP>& ambient,
-            const color<BPP>& diffuse) 
-            : tracable<N, BPP>(),
-            ambient(ambient),
-            diffuse(diffuse) {
-            vertices = { v1, v2, v3 };
-        }
-
-        triangle(const vector<N>& v1,
-            const vector<N>& v2,
-            const vector<N>& v3,
-            const color<BPP>& ambient,
-            const color<BPP>& diffuse) 
-            : tracable<N, BPP>(),
-            ambient(ambient),
-            diffuse(diffuse) {
-            vertices = { 
-                std::make_shared<vector<N>>(v1),
-                std::make_shared<vector<N>>(v2),
-                std::make_shared<vector<N>>(v3) 
-            };
-        }
+        triangle(vector<_Dims>* v1,
+            vector<_Dims>* v2,
+            vector<_Dims>* v3,
+            material* _Material) 
+            : tracable<_Dims, BPP>(),
+            vertices(v1, v2, v3),
+            mat(_Material) {}
 
         color<BPP> ambient_color(const ray<N>& r,
             const vector<N>& intersection_point) {
-            return ambient;
+            if (mat == nullptr)
+                return DEFAULT_AMBIENT(BPP);
+            return mat->get_ambient(, , DEFAULT_AMBIENT(BPP));
         }
 
         color<BPP> diffuse_color(const ray<N>& r,
