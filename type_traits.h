@@ -259,6 +259,10 @@ template <class _To, class... _Lty>
 template <class _To>
     struct are_convertible<_To> : true_type {};
 
+template <class _Ty, class... _Args>
+    struct is_constructible
+        : _Cat_base<__is_constructible(_Ty, _Args...)> {};
+
 template <class _To, 
     class _Hty, 
     class... _Tty>
