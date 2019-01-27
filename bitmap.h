@@ -16,6 +16,33 @@ template <size_t BPP>
         size_t row_size;
         size_t width, height;
 
+        _DEVHOST void encode_bitmapinfoheader() {
+                // bitmap file header
+                //file format bytes
+            data[0] = 'B';
+            data[1] = 'M';
+                // file size bytes
+            little_endian_insert(data.size(), 4, data, 2);
+                // offset
+            little_endian_insert(14 + 40, 4, data, 10);
+
+                // BITMAPINFOHEADER 
+                // the size of this header
+            little_endian_insert(40, 4, data, 14);
+                // the bitmap width in pixels
+            little_endian_insert(width, 4, data, 18);
+                // the bitmap height in pixels
+            little_endian_insert(height, 4, data, 22);
+                // the number of color planes
+            little_endian_insert(1, 2, data, 26);
+                // the number of bits per pixel
+            little_endian_insert((BPP * 8), 2, data, 28);
+                // horizontal resolution
+            little_endian_insert(2835, 4, data, 38);
+                // vertical resolution
+            little_endian_insert(2835, 4, data, 42);
+        }
+
     public:
         using _Mytype = bitmap<BPP>;
 
@@ -27,30 +54,7 @@ template <size_t BPP>
             height(height) {
             row_size = (BPP * 8 * width + 31) / 32 * 4;
             data.resize(14 + 40 + row_size * height);
-            // bitmap file header
-                //file format bytes
-            data[0] = 'B';  
-            data[1] = 'M';
-                // file size bytes
-            little_endian_insert(data.size(), 4, data, 2); 
-                // offset
-            little_endian_insert(14 + 40, 4, data, 10); 
-
-            // BITMAPINFOHEADER 
-                // the size of this header
-            little_endian_insert(40, 4, data, 14); 
-                // the bitmap width in pixels
-            little_endian_insert(width, 4, data, 18); 
-                // the bitmap height in pixels
-            little_endian_insert(height, 4, data, 22); 
-                // the number of color planes
-            little_endian_insert(1, 2, data, 26); 
-                // the number of bits per pixel
-            little_endian_insert((BPP * 8), 2, data, 28); 
-                // horizontal resolution
-            little_endian_insert(2835, 4, data, 38);
-                // vertical resolution
-            little_endian_insert(2835, 4, data, 42); 
+            encode_bitmapinfoheader();
         }
 
         _HOST bitmap(const char* filename) { read(filename); }
@@ -84,6 +88,14 @@ template <size_t BPP>
 
             for (size_t i = 0; i < bytes; ++i)
                 data[off + bytes - 1 - i] = v[i];
+        }
+
+        _DEVHOST size_t get_width() const {
+            return width;
+        }
+
+        _DEVHOST size_t get_height() const {
+            return height;
         }
 
         _HOST bool write(const char *filename) const {
@@ -121,8 +133,8 @@ template <size_t BPP>
         }
 
 #ifdef RTC_USE_CUDA
-        template <typename... _Args>
-        //typename = enable_if_t<is_constructible<_Mytype, _Args...>::value>
+    template <typename... _Args>
+        typename = enable_if_t<is_constructible<_Mytype, _Args...>::value>
         _HOST static _Mytype* device_ctr(_Args... args) {
             _Mytype h_ret(args...);
             _Mytype *d_ret_ptr;
