@@ -109,15 +109,15 @@ template <size_t BPP>
         }
 #ifdef RTC_USE_CUDA
     template <typename... _Args>
-    //typename = enable_if_t<is_constructible<_Mytype, _Args...>::value>
-    _HOST static _Mytype* device_ctr(_Args... args) {
-        _Mytype h_ret(args...);
-        _Mytype *d_ret_ptr;
-        size_t sz = sizeof(_Mytype);
-        cudaMalloc((void**)&d_ret_ptr, sz);
-        cudaMemcpy(d_ret_ptr, &h_ret, sz, cudaMemcpyHostToDevice);
-        return d_ret_ptr;
-    }
+        typename = enable_if_t<is_constructible<_Mytype, _Args...>::value>
+        _HOST static _Mytype* device_ctr(_Args... args) {
+            _Mytype h_ret(args...);
+            _Mytype *d_ret_ptr;
+            size_t sz = sizeof(_Mytype);
+            cudaMalloc((void**)&d_ret_ptr, sz);
+            cudaMemcpy(d_ret_ptr, &h_ret, sz, cudaMemcpyHostToDevice);
+            return d_ret_ptr;
+        }
 #endif /* RTC_USE_CUDA */
     };
 
