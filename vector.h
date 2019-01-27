@@ -54,7 +54,7 @@ template <size_t _Dims>
 template <size_t _Dims>
     _DEVHOST vector<_Dims> cross(const vector<_Dims>& v1,
         const vector<_Dims>& v2) {
-        throw std::exception("unimplemented function");
+        throw_exc(std::exception("unimplemented function"));
     }
 
     _DEVHOST vec3 cross(const vec3& v1,
@@ -77,7 +77,7 @@ template <size_t _Dims>
                 return;
             vec_type ln = len(*this);
             if (ln == 0)
-                throw ZeroNormalVector();
+                throw_exc(ZeroNormalVector());
             for (size_t i = 0; i < _Dims; ++i)
                 this->values[i] /= ln;
         }
@@ -99,7 +99,7 @@ template <size_t _Dims>
 template <size_t _Dims>
     _DEVHOST vector<_Dims> rotate(vector<_Dims> v,
         normal<_Dims> axis) {
-        throw std::exception("unimplemented function");
+        throw_exc(std::exception("unimplemented function"));
     }
 
     // FUNCTION TEMPLATE reflect
