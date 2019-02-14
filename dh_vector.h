@@ -128,6 +128,11 @@ template <typename _Ty>
             cudaMemcpy(d_ret_ptr->arr, &h_ret.arr, sizeof(h_ret.arr), cudaMemcpyHostToDevice);
             return d_ret_ptr;
         }
+
+        _HOST static void device_dtr(_Mytype *ptr) {
+            cudaFree(ptr->arr);
+            cudaFree(ptr);
+        }
 #endif /* RTC_USE_CUDA */
     };
 _RTC_END

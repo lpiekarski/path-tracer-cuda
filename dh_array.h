@@ -49,11 +49,10 @@ template <typename _Ty, size_t _Size>
         _DEVHOST constexpr size_t size() const noexcept {
             return _Size;
         }
-
 #ifdef RTC_USE_CUDA
     template <typename... _Args,
-        typename = enable_if_t<is_constructible<dh_array<_Ty, _Size>, _Args...>::value>>
-        _HOST static dh_array<_Ty, _Size>* device_ctr(_Args... args) {
+        typename = enable_if_t<is_constructible<_Mytype, _Args...>::value>>
+        _HOST static _Mytype* device_ctr(_Args... args) {
             _Mytype h_ret(args...);
             _Mytype *d_ret_ptr;
             size_t sz = sizeof(_Mytype);

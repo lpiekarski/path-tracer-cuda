@@ -58,6 +58,10 @@ template <typename _Ty,
             cudaMemcpy(d_ret_ptr, &h_ret, sz, cudaMemcpyHostToDevice);
             return d_ret_ptr;
         }
+
+        _HOST static void device_dtr(_Mytype *ptr) {
+                cudaFree(ptr);
+        }
 #endif /* RTC_USE_CUDA */
         _DEVHOST _Ty operator[](size_t idx) const {
             if (idx >= _Size)
