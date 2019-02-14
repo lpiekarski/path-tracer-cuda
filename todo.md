@@ -1,28 +1,43 @@
 # TODO files list
 ## arithmetic_tuple.h
 * Test device constructor
+* Create device destructor
+* Test device destructor
 ## bitmap.h
 * Handle more types of headers
 * Test device constructor
+* Create device destructor
+* Test device destructor
 ## camera.h
 * Test device constructor
+* Create device destructor
+* Test device destructor
 ## color.h
 * Test device constructor
+* Create device destructor
+* Test device destructor
 ## defs.h
 ## dh_array.h
 * Test thread safety
 * Test device constructor
+* Create device destructor
+* Test device destructor
 ## dh_vector.h
 * Test thread safety
 * Test device constructor
+* Create device destructor
+* Test device destructor
 ## exception.h
 * Create a way of handling exceptions on device
 ## material.h
-* Make material contain default colors if no bitmap is provided
 * Test device constructor
+* Create device destructor
+* Test device destructor
 ## matrix.h
 ## ray.h
 * Test device constructor
+* Create device destructor
+* Test device destructor
 ## rtc.h
 ## tclist.h
 ## tracable.h
