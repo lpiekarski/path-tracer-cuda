@@ -10,6 +10,7 @@ template <typename _Ty>
     class dh_vector {
     private:
         using value_type = _Ty;
+        using _Mytype = dh_vector<_Ty>;
 
         _Ty* arr;
         size_t sz, arr_length;
@@ -115,8 +116,8 @@ template <typename _Ty>
         }
         //TODO test
 #ifdef RTC_USE_CUDA
-    template <typename... _Args>
-        typename = enable_if_t<is_constructible<dh_array<_Ty, _Size>, _Args...>
+    template <typename... _Args,
+        typename = enable_if_t<is_constructible<_Mytype, _Args...>::value>>
             _HOST static _Mytype* device_ctr(_Args... args) {
             _Mytype h_ret(args...);
             _Mytype *d_ret_ptr;

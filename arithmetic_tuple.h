@@ -48,8 +48,8 @@ template <typename _Ty,
             return ret;
         }
 #ifdef RTC_USE_CUDA
-    template <typename... _Args>
-        typename = enable_if_t<is_constructible<_Mytype, _Args...>::value>
+    template <typename... _Args,
+        typename = enable_if_t<is_constructible<_Mytype, _Args...>::value>>
         _HOST static _Mytype* device_ctr(_Args... args) {
             _Mytype h_ret(args...);
             _Mytype *d_ret_ptr;

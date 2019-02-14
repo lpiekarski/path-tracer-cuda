@@ -51,8 +51,8 @@ template <typename _Ty, size_t _Size>
         }
 
 #ifdef RTC_USE_CUDA
-    template <typename... _Args>
-        typename = enable_if_t<is_constructible<dh_array<_Ty, _Size>, _Args...>
+    template <typename... _Args,
+        typename = enable_if_t<is_constructible<dh_array<_Ty, _Size>, _Args...>::value>>
         _HOST static dh_array<_Ty, _Size>* device_ctr(_Args... args) {
             _Mytype h_ret(args...);
             _Mytype *d_ret_ptr;
@@ -60,6 +60,10 @@ template <typename _Ty, size_t _Size>
             cudaMalloc((void**)&d_ret_ptr, sz);
             cudaMemcpy(d_ret_ptr, &h_ret, sz, cudaMemcpyHostToDevice);
             return d_ret_ptr;
+        }
+
+        _HOST static void device_dtr(_Mytype *ptr) {
+            cudaFree(ptr);
         }
 #endif /* RTC_USE_CUDA */
     };

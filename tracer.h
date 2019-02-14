@@ -109,6 +109,7 @@ namespace rtc {
         typename... _Args,
         typename = enable_if_t<_Dims >= 3 && sizeof...(_Args) == _Dims - 1 && are_convertible<size_t, _Args...>::value>>
         _HOST _vector<bitmap<BPP>> draw_bitmap(_Args... dims) {
+            // init rng structures
             std::random_device rd;
             std::mt19937 mt(rd());
             std::uniform_real_distribution<vec_type> dist(0, 1);
@@ -123,8 +124,10 @@ namespace rtc {
             for (size_t smp = 0; smp < samples_per_pixel; ++smp)
                 random_vector[smp] = dist(mt);
 
+            // loop creating ret_len / dims_arr[0] / dims_arr[1] bitmaps
             for (size_t i = 0; i < ret_len / dims_arr[0] / dims_arr[1]; ++i) {
                 bitmap<BPP> ret_bmp(dims_arr[0], dims_arr[1]);
+                // rendering result bitmap pixel by pixel samples_per_pixel times
                 for (size_t x = 0; x < dims_arr[0]; ++x) {
                     for (size_t y = 0; y < dims_arr[1]; ++y) {
                         color<BPP> sample_col;
@@ -150,15 +153,20 @@ namespace rtc {
         }
 
 #ifdef RTC_USE_CUDA
+    /*
+    1 process for each bitmap
+    1 thread for each pixel in bitmap
+
+    */
     template <size_t samples_per_pixel = 1,
         typename... _Args,
         typename = enable_if_t<_Dims >= 3 && sizeof...(_Args) == _Dims - 1 && are_convertible<size_t, _Args...>::value>>
         _DEVICE _vector<bitmap<BPP>> device_draw_bitmap(_Args... dims) {
-
+        //TODO
     }
 
-    template <typename... _Args>
-    //typename = enable_if_t<is_constructible<_Mytype, _Args...>::value>
+    template <typename... _Args,
+    typename = enable_if_t<is_constructible<_Mytype, _Args...>::value>>
     _HOST static _Mytype* device_ctr(_Args... args) {
         _Mytype h_ret(args...);
         _Mytype *d_ret_ptr;
