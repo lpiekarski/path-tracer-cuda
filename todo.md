@@ -19,8 +19,6 @@
 ## defs.h
 ## dh_array.h
 * Test thread safety
-* Test device constructor
-* Create device destructor
 * Test device destructor
 ## dh_vector.h
 * Test thread safety
@@ -53,7 +51,7 @@
 * Implement rotate
 * Implement cross other _Dims than 3
 # TODO in the project
-* Create a way to render image from gpu directly into screen
+* Create a way to render image from gpu directly into screen (openGL interop)
 * Create octree-type tracable container
 * Create voxel tracables
 * Create a way to load and save scene to/from a file
