@@ -1,15 +1,12 @@
 #ifndef __TRIANGLE_H__
 #define __TRIANGLE_H__
 
-#include <array>
-#include <memory>
-
 #include "rtc.h"
 #include "tracable.h"
 #include "vector.h"
 #include "material.h"
 
-#define DEFAULT_AMBIENT(BPP) (gray<BPP>(0))
+#define DEFAULT_AMBIENT(BPP) (gray<BPP>(0.3))
 #define DEFAULT_DIFFUSE(BPP) (gray<BPP>(1))
 
 // triangle data:
@@ -27,7 +24,7 @@ template <size_t _Dims,
     class triangle : public tracable<_Dims, BPP> {
     private:
         _array<vector<_Dims>*, 3> vertices;
-        material* mat;
+        material<BPP>* mat;
 
         _DEVHOST normal<_Dims> get_normal() {
             return cross((*vertices[1]) - (*vertices[0]), (*vertices[2]) - (*vertices[0]));
@@ -35,7 +32,7 @@ template <size_t _Dims,
 
     public:
         _DEVHOST triangle() 
-            : tracable<_Dims, BPP>()
+            : tracable<_Dims, BPP>(),
             vertices(),
             mat(nullptr) {}
 
@@ -46,7 +43,7 @@ template <size_t _Dims,
             vertices(v1, v2, v3),
             mat(nullptr) {}
 
-        _DEVHOST triangle& set_material(material* _Material) {
+        _DEVHOST triangle& set_material(material<BPP>* _Material) {
             mat = _Material;
             return *this;
         }
@@ -54,39 +51,40 @@ template <size_t _Dims,
         triangle(vector<_Dims>* v1,
             vector<_Dims>* v2,
             vector<_Dims>* v3,
-            material* _Material) 
+            material<BPP>* _Material) 
             : tracable<_Dims, BPP>(),
             vertices(v1, v2, v3),
             mat(_Material) {}
 
-        color<BPP> ambient_color(const ray<N>& r,
-            const vector<N>& intersection_point) {
-            if (mat == nullptr)
-                return DEFAULT_AMBIENT(BPP);
-            return mat->get_ambient(, , DEFAULT_AMBIENT(BPP));
+        color<BPP> ambient_color(const ray<_Dims>& r,
+            const vector<_Dims>& intersection_point) {
+            //if (mat == nullptr)
+                return ambient;
+            //return mat->get_ambient(, , DEFAULT_AMBIENT(BPP));
         }
 
-        color<BPP> diffuse_color(const ray<N>& r,
-            const vector<N>& intersection_point) {
+        color<BPP> diffuse_color(const ray<_Dims>& r,
+            const vector<_Dims>& intersection_point) {
             return diffuse;
+            //return diffuse;
         }
 
-        ray<N> get_reflection(const ray<N>& r,
-            const vector<N>& intersection_point) {
-            normal<N> n(get_normal());
+        ray<_Dims> get_reflection(const ray<_Dims>& r,
+            const vector<_Dims>& intersection_point) {
+            normal<_Dims> n(get_normal());
             if (dot(n, r.dir()) > 0)
-                n = vector<N>() - n;
-            ray<N> ret(reflect(r.dir(), n), intersection_point);
-            return ray<N>(ret.dir(), ret.get_point(SURFACE_EPSILON));
+                n = vector<_Dims>() - n;
+            ray<_Dims> ret(reflect(r.dir(), n), intersection_point);
+            return ray<_Dims>(ret.dir(), ret.get_point(SURFACE_EPSILON));
         }
 
-        bool ray_intersection(const ray<N>& r,
-            std::conditional_t<N != 3, vec_type&, void*> intersection_dist) {
+        bool ray_intersection(const ray<_Dims>& r,
+            std::conditional_t<_Dims != 3, vec_type&, void*> intersection_dist) {
             throw std::exception("unimplemented function");
         }
 
-        bool ray_intersection(const ray<N>& r,
-            std::conditional_t<N == 3, vec_type&, void*> intersection_dist) {
+        bool ray_intersection(const ray<_Dims>& r,
+            std::conditional_t<_Dims == 3, vec_type&, void*> intersection_dist) {
             vec3 vertex0 = *vertices[0];
             vec3 vertex1 = *vertices[1];
             vec3 vertex2 = *vertices[2];
