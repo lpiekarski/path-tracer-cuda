@@ -5,7 +5,7 @@
 
 #include "rtc.h"
 #include "bitmap.h"
-//TODO: replace shared pointers with c style pointers
+
 _RTC_BEGIN
     // CLASS TEMPLATE material
 template <size_t BPP>
@@ -18,6 +18,12 @@ template <size_t BPP>
             *refraction, 
             *normal;
             //subsurface
+        color<BPP> *cdiffuse,
+            *cambient,
+            *creflection,
+            *crefresction,
+            *cnormal;
+            //csubsurface
 
         _DEVHOST color<BPP> get_from_bmp(const vec_type& x,
             const vec_type& y,
@@ -38,10 +44,20 @@ template <size_t BPP>
             ambient(nullptr),
             reflection(nullptr),
             refraction(nullptr),
-            normal(nullptr) {}
+            normal(nullptr),
+            cdiffuse(nullptr),
+            cambient(nullptr),
+            creflection(nullptr),
+            crefraction(nullptr),
+            cnormal(nullptr) {}
 
         _DEVHOST material& set_diffuse(bitmap<BPP> *_Diffuse_bmp) {
             diffuse = _Diffuse_bmp;
+            return *this;
+        }
+
+        _DEVHOST material& set_diffuse(color<BPP> *_Diffuse_col) {
+            cdiffuse = _Diffuse_col;
             return *this;
         }
 
@@ -50,8 +66,18 @@ template <size_t BPP>
             return *this;
         }
 
+        _DEVHOST material& set_ambient(color<BPP> *_Ambient_col) {
+            cambient = _Ambient_col;
+            return *this;
+        }
+
         _DEVHOST material& set_reflection(bitmap<BPP> *_Reflection_bmp) {
             reflection = _Reflection_bmp;
+            return *this;
+        }
+
+        _DEVHOST material& set_reflection(color<BPP> *_Reflection_col) {
+            creflection = _Reflection_col;
             return *this;
         }
 
@@ -60,43 +86,48 @@ template <size_t BPP>
             return *this;
         }
 
+        _DEVHOST material& set_refraction(color<BPP> *_Refraction_col) {
+            crefraction = _Refraction_col;
+            return *this;
+        }
+
         _DEVHOST material& set_normal(bitmap<BPP> *_Normal_bmp) {
             normal = _Normal_bmp;
             return *this;
         }
 
+        _DEVHOST material& set_normal(color<BPP> *_Normal_col) {
+            cnormal = _Normal_col;
+            return *this;
+        }
+
         _DEVHOST color<BPP> get_diffuse(const vec_type& x,
-            const vec_type& y,
-            const color<BPP>& def) {
-            return get_from_bmp(x, y, def, diffuse);
+            const vec_type& y) {
+            return get_from_bmp(x, y, cdiffuse, diffuse);
         }
 
         _DEVHOST color<BPP> get_ambient(const vec_type& x,
-            const vec_type& y,
-            const color<BPP>& def) {
-            return get_from_bmp(x, y, def, ambient);
+            const vec_type& y) {
+            return get_from_bmp(x, y, cambient, ambient);
         }
 
         _DEVHOST color<BPP> get_reflection(const vec_type& x,
-            const vec_type& y,
-            const color<BPP>& def) {
-            return get_from_bmp(x, y, def, reflection);
+            const vec_type& y) {
+            return get_from_bmp(x, y, creflection, reflection);
         }
 
         _DEVHOST color<BPP> get_refraction(const vec_type& x,
-            const vec_type& y,
-            const color<BPP>& def) {
-            return get_from_bmp(x, y, def, refraction);
+            const vec_type& y) {
+            return get_from_bmp(x, y, crefraction, refraction);
         }
 
         _DEVHOST color<BPP> get_normal(const vec_type& x,
-            const vec_type& y,
-            const color<BPP>& def) {
-            return get_from_bmp(x, y, def, normal);
+            const vec_type& y) {
+            return get_from_bmp(x, y, cnormal, normal);
         }
 #ifdef RTC_USE_CUDA
-        template <typename... _Args>
-        typename = enable_if_t<is_constructible<_Mytype, _Args...>::value>
+        template <typename... _Args,
+        typename = enable_if_t<is_constructible<_Mytype, _Args...>::value>>
             _HOST static _Mytype* device_ctr(_Args... args) {
             _Mytype h_ret(args...);
             _Mytype *d_ret_ptr;
