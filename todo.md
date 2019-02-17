@@ -55,3 +55,4 @@
 * Create octree-type tracable container
 * Create voxel tracables
 * Create a way to load and save scene to/from a file
+* Create octree structure for triangle mesh scenes
