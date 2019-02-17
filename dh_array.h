@@ -64,6 +64,12 @@ template <typename _Ty, size_t _Size>
         _HOST static void device_dtr(_Mytype *ptr) {
             cudaFree(ptr);
         }
+
+        _HOST static _Mytype host_cpy(_Mytype *d_ptr) {
+            _Mytype ret;
+            cudaMemcpy(&ret, d_ptr, sizeof(_Mytype), cudaMemcpyDeviceToHost);
+            return ret;
+        }
 #endif /* RTC_USE_CUDA */
     };
 _RTC_END
