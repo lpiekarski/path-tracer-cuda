@@ -76,8 +76,8 @@ template <size_t _Dims>
             if (sizeof...(P) == 0)
                 return;
             vec_type ln = len(*this);
-            if (ln == 0)
-                throw_exc(ZeroNormalVector());
+            //if (ln == 0)
+            //    throw_exc(ZeroNormalVector());
             for (size_t i = 0; i < _Dims; ++i)
                 this->values[i] /= ln;
         }
@@ -119,7 +119,7 @@ template <size_t _Dims>
 
     // FUNCTION TEMPLATE standard_base
 template <size_t _Dims>
-    _array<normal<_Dims>, _Dims> standard_base() {
+    _DEVHOST _array<normal<_Dims>, _Dims> standard_base() {
         _array<normal<_Dims>, _Dims> ret;
         for (size_t i = 0; i < _Dims; ++i)
             ret[i] = unit_vector<_Dims>(i);
@@ -128,7 +128,7 @@ template <size_t _Dims>
 
     // FUNCTION TEMPLATE from_value
 template <size_t _Dims>
-    vector<_Dims> from_value(const vec_type& val) {
+    _DEVHOST vector<_Dims> from_value(const vec_type& val) {
         vector<_Dims> ret;
         for (size_t i = 0; i < _Dims; ++i)
             ret[i] = val;

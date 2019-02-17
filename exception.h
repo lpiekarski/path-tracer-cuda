@@ -10,6 +10,7 @@
 #include "rtc.h"
 
 _RTC_BEGIN
+/*
     class IndexOutOfBounds : public std::exception {
     public:
         virtual char const * what() const noexcept {
@@ -23,13 +24,13 @@ _RTC_BEGIN
             return "ZeroNormalVector";
         }
     };
-
+    
     _DEVHOST void throw_exc(const std::exception& e) {
 #ifndef __CUDA_ARCH__
         throw e;
 #endif
     }
-
+*/
 _RTC_END
 
 #endif /* __EXCEPTION_H__ */
