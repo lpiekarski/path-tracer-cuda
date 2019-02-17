@@ -124,14 +124,31 @@ template <typename _Ty>
             size_t sz = sizeof(_Mytype);
             cudaMalloc((void**)&d_ret_ptr, sz);
             cudaMemcpy(d_ret_ptr, &h_ret, sz, cudaMemcpyHostToDevice);
-            cudaMalloc((void**)&d_ret_ptr->arr, sizeof(h_ret.arr));
-            cudaMemcpy(d_ret_ptr->arr, &h_ret.arr, sizeof(h_ret.arr), cudaMemcpyHostToDevice);
+            size_t arr_sz = sizeof(_Ty) * h_ret.size();
+            _Ty *hostarr;
+            cudaMalloc((void**)&hostarr, arr_sz);
+            cudaMemcpy(hostarr, h_ret.arr, arr_sz, cudaMemcpyHostToDevice);
+            cudaMemcpy(&(d_ret_ptr->arr), &hostarr, sizeof(_Ty *), cudaMemcpyHostToDevice);
             return d_ret_ptr;
         }
 
-        _HOST static void device_dtr(_Mytype *ptr) {
-            cudaFree(ptr->arr);
-            cudaFree(ptr);
+        //TODO test deleting d_ptr->arr
+        _HOST static void device_dtr(_Mytype *d_ptr) {
+            cudaFree(&(d_ptr->arr));
+            cudaFree(d_ptr);
+        }
+
+        _HOST static _Mytype host_cpy(_Mytype *d_ptr) {
+            _Mytype ret;
+            delete[] (ret.arr);
+            size_t sz = sizeof(_Mytype);
+            cudaMemcpy(&ret, d_ptr, sz, cudaMemcpyDeviceToHost);
+            size_t arr_sz = sizeof(_Ty) * ret.size();
+            _Ty *devarr;
+            cudaMemcpy(&devarr, &(d_ptr->arr), sizeof(_Ty *), cudaMemcpyDeviceToHost);
+            ret.arr = new _Ty[ret.size()];
+            cudaMemcpy(ret.arr, devarr, arr_sz, cudaMemcpyDeviceToHost);
+            return ret;
         }
 #endif /* RTC_USE_CUDA */
     };
