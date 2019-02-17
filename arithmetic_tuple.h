@@ -62,16 +62,22 @@ template <typename _Ty,
         _HOST static void device_dtr(_Mytype *ptr) {
                 cudaFree(ptr);
         }
+
+        _HOST static _Mytype host_cpy(_Mytype *d_ptr) {
+            _Mytype ret;
+            cudaMemcpy(&ret, d_ptr, sizeof(_Mytype), cudaMemcpyDeviceToHost);
+            return ret;
+        }
 #endif /* RTC_USE_CUDA */
         _DEVHOST _Ty operator[](size_t idx) const {
-            if (idx >= _Size)
-                throw_exc(IndexOutOfBounds());
+            //if (idx >= _Size)
+            //    throw_exc(IndexOutOfBounds());
             return values[idx];
         }
 
         _DEVHOST _Ty& operator[](size_t idx) {
-            if (idx >= _Size)
-                throw_exc(IndexOutOfBounds());
+            //if (idx >= _Size)
+            //    throw_exc(IndexOutOfBounds());
             return values[idx];
         }
 
