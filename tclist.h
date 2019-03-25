@@ -11,7 +11,7 @@ template <size_t _Dims,
     size_t BPP>
     class tracable_list {
     private:
-        _vector<tracable<_Dims, BPP>*> tracables;
+        _vector<tracable<_Dims, BPP> *> tracables;
 
     public:
         _DEVHOST tracable_list() : tracables() {}
@@ -21,6 +21,7 @@ template <size_t _Dims,
 
         _DEVHOST tracable_list& operator=(const tracable_list& other) {
             tracables = other.tracables;
+            return *this;
         }
 
         _DEVHOST void add(tracable<_Dims, BPP>& t) { tracables.push_back(&t); }
@@ -47,6 +48,7 @@ template <size_t _Dims,
     size_t BPP>
     struct is_tracable_container<tracable_list<_Dims, BPP>>
     : true_type {};
+
 _RTC_END
 
 #endif /* __TCLIST_H__ */

@@ -2,6 +2,9 @@
 #define __TRACABLE_H__
 
 #include "rtc.h"
+#include "color.h"
+#include "vector.h"
+#include "ray.h"
 
 _RTC_BEGIN
 template <size_t _Dims,

@@ -83,8 +83,8 @@ template <size_t BPP>
             byte_color<BPP> v(val);
             size_t bytes = BPP;
             size_t off = 14 + 40 + y * row_size + x * bytes;
-            if (off + bytes - 1 >= data.size())
-                throw IndexOutOfBounds();
+            //if (off + bytes - 1 >= data.size())
+            //    throw IndexOutOfBounds();
 
             for (size_t i = 0; i < bytes; ++i)
                 data[off + bytes - 1 - i] = v[i];
@@ -151,6 +151,10 @@ template <size_t BPP>
         _HOST static _Mytype host_cpy(_Mytype *d_ptr) {
             _Mytype ret;
             cudaMemcpy(&ret, d_ptr, sizeof(_Mytype), cudaMemcpyDeviceToHost);
+            _vector<char> *d_data = new _vector<char>();
+            cudaMemcpy(d_data, &ret.data, sizeof(_vector<char>), cudaMemcpyDeviceToHost);
+            ret.data = _vector<char>::host_cpy(d_data);
+            delete d_data;
             return ret;
         }
 #endif /* RTC_USE_CUDA */

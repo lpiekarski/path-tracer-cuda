@@ -22,6 +22,7 @@ _RTC_BEGIN
 template <size_t _Dims,
     size_t BPP>
     class triangle : public tracable<_Dims, BPP> {
+    using _Mytype = triangle<_Dims, BPP>;
     private:
         _array<vector<_Dims>*, 3> vertices;
         material<BPP>* mat;
@@ -48,7 +49,7 @@ template <size_t _Dims,
             return *this;
         }
 
-        triangle(vector<_Dims>* v1,
+        _DEVHOST triangle(vector<_Dims>* v1,
             vector<_Dims>* v2,
             vector<_Dims>* v3,
             material<BPP>* _Material) 
@@ -56,20 +57,20 @@ template <size_t _Dims,
             vertices(v1, v2, v3),
             mat(_Material) {}
 
-        color<BPP> ambient_color(const ray<_Dims>& r,
+        _DEVHOST color<BPP> ambient_color(const ray<_Dims>& r,
             const vector<_Dims>& intersection_point) {
             //if (mat == nullptr)
                 return ambient;
             //return mat->get_ambient(, , DEFAULT_AMBIENT(BPP));
         }
 
-        color<BPP> diffuse_color(const ray<_Dims>& r,
+        _DEVHOST color<BPP> diffuse_color(const ray<_Dims>& r,
             const vector<_Dims>& intersection_point) {
             return diffuse;
             //return diffuse;
         }
 
-        ray<_Dims> get_reflection(const ray<_Dims>& r,
+        _DEVHOST ray<_Dims> get_reflection(const ray<_Dims>& r,
             const vector<_Dims>& intersection_point) {
             normal<_Dims> n(get_normal());
             if (dot(n, r.dir()) > 0)
@@ -78,12 +79,12 @@ template <size_t _Dims,
             return ray<_Dims>(ret.dir(), ret.get_point(SURFACE_EPSILON));
         }
 
-        bool ray_intersection(const ray<_Dims>& r,
+        _DEVHOST bool ray_intersection(const ray<_Dims>& r,
             std::conditional_t<_Dims != 3, vec_type&, void*> intersection_dist) {
             throw std::exception("unimplemented function");
         }
 
-        bool ray_intersection(const ray<_Dims>& r,
+        _DEVHOST bool ray_intersection(const ray<_Dims>& r,
             std::conditional_t<_Dims == 3, vec_type&, void*> intersection_dist) {
             vec3 vertex0 = *vertices[0];
             vec3 vertex1 = *vertices[1];
@@ -114,6 +115,9 @@ template <size_t _Dims,
             else // This means that there is a line intersection but not a ray intersection.
                 return false;
         }
+        /*
+        cuda alloc functions
+        */
     };
 _RTC_END
 

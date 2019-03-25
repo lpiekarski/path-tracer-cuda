@@ -44,7 +44,7 @@ template <typename _Ty>
         }
 
         _DEVHOST void resize(size_t new_size) {
-            _Ty* new_arr = new _Ty[new_size];
+            _Ty *new_arr = new _Ty[new_size];
             size_t copy_length = new_size;
             if (copy_length > sz)
                 copy_length = sz;
@@ -55,7 +55,7 @@ template <typename _Ty>
             sz = new_size;
             arr = new_arr;
             for (size_t i = copy_length; i < sz; ++i)
-                arr[i] = 0;
+                arr[i] = _Ty();
         }
 
         _DEVHOST void clear() {
@@ -141,17 +141,25 @@ template <typename _Ty>
         _HOST static _Mytype host_cpy(_Mytype *d_ptr) {
             _Mytype ret;
             delete[] (ret.arr);
-            size_t sz = sizeof(_Mytype);
-            cudaMemcpy(&ret, d_ptr, sz, cudaMemcpyDeviceToHost);
-            size_t arr_sz = sizeof(_Ty) * ret.size();
-            _Ty *devarr;
-            cudaMemcpy(&devarr, &(d_ptr->arr), sizeof(_Ty *), cudaMemcpyDeviceToHost);
-            ret.arr = new _Ty[ret.size()];
-            cudaMemcpy(ret.arr, devarr, arr_sz, cudaMemcpyDeviceToHost);
+            cudaMemcpy(&ret, d_ptr, sizeof(_Mytype), cudaMemcpyDeviceToHost);
+            const size_t ret_size = ret.size();
+            //size_t arr_sz = sizeof(_Ty) * ret_size;
+            //_Ty *devarr = new _Ty[ret_size];
+            //cudaMemcpy(devarr, ret.arr, arr_sz, cudaMemcpyDeviceToHost);
+            ret.arr = new _Ty[ret_size];
+            for (size_t i = 0; i < ret_size; ++i)
+                ret.arr[i] = _Ty();//_Ty::host_cpy(&(devarr[i]));
+            //delete[] devarr;
             return ret;
         }
 #endif /* RTC_USE_CUDA */
     };
+#ifdef RTC_USE_CUDA
+    template <typename _Ty>
+    dh_vector<_Ty> host_cpy(dh_vector<_Ty> *d_ptr) {
+        return dh_vector<_Ty>::host_cpy(d_ptr);
+    }
+#endif /* RTC_USE_CUDA */
 _RTC_END
 
 #endif /* __DH_VECTOR_H__ */

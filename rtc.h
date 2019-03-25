@@ -11,21 +11,21 @@
 _RTC_BEGIN
 #if defined(RTC_PRECISION_LONG_DOUBLE)
 using vec_type = long double;
-constexpr vec_type EPSILON = LDBL_EPSILON * 30;
-constexpr vec_type SURFACE_EPSILON = 30 * EPSILON;
-constexpr vec_type MAX_RAY_LENGTH = LDBL_MAX;
+#define EPSILON (LDBL_EPSILON * 30)
+#define SURFACE_EPSILON (30 * EPSILON)
+#define MAX_RAY_LENGTH (LDBL_MAX)
 
 #elif defined(RTC_PRECISION_DOUBLE)
 using vec_type = double;
-constexpr vec_type EPSILON = DBL_EPSILON;
-constexpr vec_type SURFACE_EPSILON = 30 * EPSILON;
-constexpr vec_type MAX_RAY_LENGTH = DBL_MAX;
+#define EPSILON (DBL_EPSILON)
+#define SURFACE_EPSILON (30 * EPSILON)
+#define MAX_RAY_LENGTH (DBL_MAX)
 
 #else
 using vec_type = float;
-constexpr vec_type EPSILON = FLT_EPSILON * 30;
-constexpr vec_type SURFACE_EPSILON = 30 * EPSILON;
-constexpr vec_type MAX_RAY_LENGTH = FLT_MAX;
+#define EPSILON (FLT_EPSILON * 30)
+#define SURFACE_EPSILON (30 * EPSILON)
+#define MAX_RAY_LENGTH (FLT_MAX)
 
 #endif
     // TEMPLATE CLASS is_tracable_container

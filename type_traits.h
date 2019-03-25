@@ -274,6 +274,9 @@ template <class _To,
 template <class... _Lty>
     using are_arithmetic = for_all<is_arithmetic, _Lty...>;
 
+template <class _Ty>
+    struct requires_deep_copy<_Ty> : false_type {};
+
 #if _HAS_CXX17
 template <class _Ty,
     class _Uty>

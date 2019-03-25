@@ -1,9 +1,7 @@
 #ifndef __TRACER_H__
 #define __TRACER_H__
 
-#include <memory>
 #include <random>
-#include <type_traits>
 #ifdef RTC_TIMER
 #ifdef RTC_USE_CUDA
 #define init_sample()
@@ -33,15 +31,16 @@
 #endif 
 
 #include "rtc.h"
-
+#include "defs.h"
+#include "type_traits.h"
 #include "bitmap.h"
 #include "camera.h"
 #include "color.h"
+#include "vector.h"
 #include "ray.h"
 #include "tracable.h"
 
-namespace rtc {
-
+_RTC_BEGIN
     constexpr size_t MAX_RAY_BOUNCES = 5;
 
     template <class TracableContainer,
@@ -76,9 +75,10 @@ namespace rtc {
 
         _DEVHOST tracer() : container(), cam() {}
 
-        _DEVHOST tracer(const tracer&) = delete;
-
-        _DEVHOST tracer& operator=(const tracer&) = delete;
+        _DEVHOST tracer(const tracer& other) {
+            container = other.container;
+            cam = other.cam;
+        }
 
         _DEVHOST tracer(tracer&& other) : container(std::move(other.container)) {}
 
@@ -153,17 +153,11 @@ namespace rtc {
         }
 
 #ifdef RTC_USE_CUDA
-    /*
-    1 process for each bitmap
-    1 thread for each pixel in bitmap
-
-    */
-    template <size_t samples_per_pixel = 1,
-        typename... _Args,
-        typename = enable_if_t<_Dims >= 3 && sizeof...(_Args) == _Dims - 1 && are_convertible<size_t, _Args...>::value>>
-        _DEVICE _vector<bitmap<BPP>> device_draw_bitmap(_Args... dims) {
-        //TODO
-    }
+    template <
+        size_t samples_per_pixel = 1,
+        typename... _Args, 
+        typename = enable_if_t<_Dims >= 3 && sizeof...(_Args) == _Dims - 1 && are_convertible<size_t, _Args...>::value >>
+    _HOST _vector<bitmap<BPP>> device_draw_bitmap(_Args... dims);
 
     template <typename... _Args,
     typename = enable_if_t<is_constructible<_Mytype, _Args...>::value>>
@@ -179,8 +173,96 @@ namespace rtc {
     _HOST static void device_dtr(_Mytype *ptr) {
         cudaFree(ptr);
     }
+
+    _HOST static _Mytype host_cpy(_Mytype *d_ptr) {
+        _Mytype ret;
+        cudaMemcpy(&ret, d_ptr, sizeof(_Mytype), cudaMemcpyDeviceToHost);
+        return ret;
+    }
 #endif /* RTC_USE_CUDA */
     };
+
+#ifdef RTC_USE_CUDA
+_RTC_END
+    template <class TracableContainer,
+        size_t _Dims,
+        size_t BPP>
+    __global__ void draw_bitmap_kernel(rtc::tracer<TracableContainer, _Dims, BPP> *t,
+        rtc::_vector<rtc::bitmap<BPP>> *ret,
+        rtc::_array<size_t, _Dims - 1> *dims_arr,
+        rtc::_vector<rtc::vec_type> *random_vector,
+        size_t samples_per_pixel) {
+        size_t bmp_num = blockIdx.x;
+        size_t pxl_num = threadIdx.x;
+        size_t x = pxl_num % (*dims_arr)[0];
+        size_t y = pxl_num / (*dims_arr)[0];
+        rtc::color<BPP> sample_col;
+
+        for (size_t smp = 0; smp < samples_per_pixel; ++smp) {
+            rtc::_array<rtc::vec_type, _Dims - 1> screen_coord;
+            size_t c = bmp_num;
+            screen_coord[0] = (static_cast<rtc::vec_type>(x + (*random_vector)[smp]) / (*dims_arr)[0] - (rtc::vec_type)0.5) * (rtc::vec_type)2;
+            screen_coord[1] = (static_cast<rtc::vec_type>(y + (*random_vector)[smp]) / (*dims_arr)[1] - (rtc::vec_type)0.5) * (rtc::vec_type)2;
+            for (size_t j = 2; j < _Dims - 1; ++j) {
+                screen_coord[j] = (static_cast<rtc::vec_type>((c % (*dims_arr)[j]) + (*random_vector)[smp]) / (*dims_arr)[j] - (rtc::vec_type)0.5) * (rtc::vec_type)2;
+                c /= (*dims_arr)[j];
+            }
+            sample_col = sample_col + t->trace_from_camera(screen_coord.data()) / (rtc::vec_type)samples_per_pixel;
+        }
+        (*ret)[bmp_num].set(x, y, sample_col);
+    }
+_RTC_BEGIN
+    template <class TracableContainer,
+        size_t _Dims,
+        size_t BPP>
+    template <size_t samples_per_pixel,
+        typename... _Args,
+        typename>
+    _HOST _vector<bitmap<BPP>> tracer<TracableContainer, _Dims, BPP>::device_draw_bitmap(_Args... dims) {
+        // creating dims array
+        _array<size_t, _Dims - 1> dims_arr = { static_cast<size_t>(dims)... };
+        size_t ret_len = dims_arr[0] * dims_arr[1];
+        for (size_t i = 2; i < _Dims - 1; ++i)
+            ret_len *= dims_arr[i];
+        auto d_dims_arr = decltype(dims_arr)::device_ctr(dims_arr);
+
+        // creating random vector for pixel samples
+        std::random_device rd;
+        std::mt19937 mt(rd());
+        std::uniform_real_distribution<vec_type> dist(0, 1);
+
+        _array<vec_type, samples_per_pixel> random_vector;
+        for (size_t smp = 0; smp < samples_per_pixel; ++smp)
+            random_vector[smp] = dist(mt);
+        auto d_random_vector = _array<vec_type, samples_per_pixel>::device_ctr(random_vector);
+
+        size_t bitmaps_count = ret_len / dims_arr[0] / dims_arr[1];
+        size_t pixels_per_bitmap = dims_arr[0] * dims_arr[1];
+
+        // creating return vector of bitmaps
+        _vector<bitmap<BPP>> ret;
+        ret.resize(bitmaps_count);
+        for (size_t i = 0; i < bitmaps_count; ++i)
+            ret[i] = bitmap<BPP>(dims_arr[0], dims_arr[1]);
+        auto d_ret = _vector<bitmap<BPP>>::device_ctr(ret);
+
+        draw_bitmap_kernel<<<bitmaps_count, pixels_per_bitmap>>>(this,
+            d_ret,
+            d_dims_arr,
+            (rtc::_vector<rtc::vec_type> *)d_random_vector,
+            samples_per_pixel);
+        cudaDeviceSynchronize();
+
+        ret = _vector<bitmap<BPP>>::host_cpy(d_ret);
+
+        // freeing device memory
+        _vector<bitmap<BPP>>::device_dtr(d_ret);
+        decltype(random_vector)::device_dtr(d_random_vector);
+        decltype(dims_arr)::device_dtr(d_dims_arr);
+
+        return ret;
+    }
+#endif /* RTC_USE_CUDA */
 _RTC_END
 
 #endif /* __TRACER_H__ */

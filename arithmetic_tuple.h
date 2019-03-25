@@ -63,6 +63,15 @@ template <typename _Ty,
                 cudaFree(ptr);
         }
 
+    template <typename = enable_if_t<requires_deep_copy<_Mytype>::value>>
+        _HOST static _Mytype host_cpy(_Mytype *d_ptr) {
+            _Mytype ret;
+            cudaMemcpy(&ret, d_ptr, sizeof(_Mytype), cudaMemcpyDeviceToHost);
+            // copy values
+            return ret;
+        }
+
+    template <typename = enable_if_t<!requires_deep_copy<_Mytype>::value>>
         _HOST static _Mytype host_cpy(_Mytype *d_ptr) {
             _Mytype ret;
             cudaMemcpy(&ret, d_ptr, sizeof(_Mytype), cudaMemcpyDeviceToHost);
@@ -203,6 +212,11 @@ template <typename _Ty,
             return ret;
         }
     };
+#ifdef RTC_USE_CUDA
+    template <_Ty>
+    struct requires_deep_copy <arithmetic_tuple<_Ty>>
+        : bool_constant<requires_deep_copy<_Ty>> {};
+#endif /* RTC_USE_CUDA */
 _RTC_END
 
 #endif /* __ARITHMETIC_TUPLE_H__ */

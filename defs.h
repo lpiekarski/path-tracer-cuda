@@ -16,11 +16,13 @@
 #include <cuda_runtime.h>
 #define _DEVICE __device__
 #define _HOST __host__
+#define _GLOBAL __global__
 #define _DEVHOST _DEVICE _HOST
 #else /* !RTC_USE_CUDA */
 #define _DEVICE
 #define _HOST
 #define _DEVHOST
+#define _GLOBAL
 #endif
 
 _RTC_BEGIN
