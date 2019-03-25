@@ -3,7 +3,7 @@
 
 #include "rtc.h"
 #include "arithmetic_tuple.h"
-#include "exception.h"
+#include "../cuda_ext/exception.h"
 
 _RTC_BEGIN
     // ALIAS TEMPLATE vector

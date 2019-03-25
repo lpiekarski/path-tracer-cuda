@@ -1,7 +1,7 @@
 #ifndef __DH_ARRAY_H__
 #define __DH_ARRAY_H__
 
-#include "type_traits.h"
+#include "../cuda_ext/type_traits.h"
 
 _RTC_BEGIN
 template <typename _Ty, size_t _Size>

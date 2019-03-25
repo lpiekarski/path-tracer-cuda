@@ -89,30 +89,30 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CudaCompile Include="kernel.cu" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="arithmetic_tuple.h" />
-    <ClInclude Include="bitmap.h" />
-    <ClInclude Include="camera.h" />
-    <ClInclude Include="color.h" />
-    <ClInclude Include="defs.h" />
-    <ClInclude Include="dh_array.h" />
-    <ClInclude Include="dh_vector.h" />
-    <ClInclude Include="exception.h" />
-    <ClInclude Include="material.h" />
-    <ClInclude Include="matrix.h" />
-    <ClInclude Include="ray.h" />
-    <ClInclude Include="rtc.h" />
-    <ClInclude Include="tclist.h" />
-    <ClInclude Include="tracable.h" />
-    <ClInclude Include="tracer.h" />
-    <ClInclude Include="triangle.h" />
-    <ClInclude Include="type_traits.h" />
-    <ClInclude Include="vector.h" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="todo.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\cuda_ext\exception.h" />
+    <ClInclude Include="src\cuda_ext\type_traits.h" />
+    <ClInclude Include="src\rtc\arithmetic_tuple.h" />
+    <ClInclude Include="src\rtc\bitmap.h" />
+    <ClInclude Include="src\rtc\camera.h" />
+    <ClInclude Include="src\rtc\color.h" />
+    <ClInclude Include="src\rtc\defs.h" />
+    <ClInclude Include="src\rtc\dh_array.h" />
+    <ClInclude Include="src\rtc\dh_vector.h" />
+    <ClInclude Include="src\rtc\material.h" />
+    <ClInclude Include="src\rtc\matrix.h" />
+    <ClInclude Include="src\rtc\ray.h" />
+    <ClInclude Include="src\rtc\rtc.h" />
+    <ClInclude Include="src\rtc\tclist.h" />
+    <ClInclude Include="src\rtc\tracable.h" />
+    <ClInclude Include="src\rtc\tracer.h" />
+    <ClInclude Include="src\rtc\triangle.h" />
+    <ClInclude Include="src\rtc\vector.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="src\kernel.cu" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

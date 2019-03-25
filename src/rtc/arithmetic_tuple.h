@@ -2,7 +2,7 @@
 #define __ARITHMETIC_TUPLE_H__
 
 #include "rtc.h"
-#include "exception.h"
+#include "../cuda_ext/exception.h"
 
 _RTC_BEGIN
     // CLASS TEMPLATE arithmetic_tuple

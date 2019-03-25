@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <vector>
 
-#include "type_traits.h"
+#include "../cuda_ext/type_traits.h"
 #include "defs.h"
 
 _RTC_BEGIN

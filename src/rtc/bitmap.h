@@ -4,7 +4,7 @@
 #include <fstream>
 
 #include "rtc.h"
-#include "exception.h"
+#include "../cuda_ext/exception.h"
 #include "color.h"
 
 _RTC_BEGIN

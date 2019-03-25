@@ -3,7 +3,7 @@
 
 #include "rtc.h"
 #include "tracable.h"
-#include "type_traits.h"
+#include "../cuda_ext/type_traits.h"
 
 _RTC_BEGIN
     // CLASS TEMPLATE tracable_list

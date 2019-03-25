@@ -32,7 +32,7 @@
 
 #include "rtc.h"
 #include "defs.h"
-#include "type_traits.h"
+#include "../cuda_ext/type_traits.h"
 #include "bitmap.h"
 #include "camera.h"
 #include "color.h"

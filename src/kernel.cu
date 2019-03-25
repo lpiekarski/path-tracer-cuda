@@ -2,8 +2,8 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 #include <iostream>
-#include "tclist.h"
-#include "tracer.h"
+#include "rtc/tclist.h"
+#include "rtc/tracer.h"
 
 using namespace rtc;
 using namespace std;

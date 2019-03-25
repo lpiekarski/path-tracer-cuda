@@ -7,9 +7,7 @@
 
 #include <exception>
 
-#include "rtc.h"
-
-_RTC_BEGIN
+//_RTC_BEGIN
 /*
     class IndexOutOfBounds : public std::exception {
     public:
@@ -31,6 +29,6 @@ _RTC_BEGIN
 #endif
     }
 */
-_RTC_END
+//_RTC_END
 
 #endif /* __EXCEPTION_H__ */
